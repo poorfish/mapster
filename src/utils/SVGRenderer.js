@@ -89,12 +89,12 @@ function geometryToPolygon(geometry, bounds, width = 600, height = 800) {
  * @param {Object} bounds - Coordinate bounds
  * @returns {Array} Array of React SVG path elements
  */
-export function renderRoads(roads, theme, bounds) {
+export function renderRoads(roads, theme, bounds, width, height) {
     if (!roads || roads.length === 0) return [];
 
     return roads.map((road, index) => {
         const highwayType = road.tags?.highway || 'unclassified';
-        const pathData = geometryToPath(road.geometry, bounds);
+        const pathData = geometryToPath(road.geometry, bounds, width, height);
 
         if (!pathData) return null;
 
@@ -119,7 +119,7 @@ export function renderRoads(roads, theme, bounds) {
  * @param {Object} bounds - Coordinate bounds
  * @returns {Array} Array of React SVG polygon/path elements
  */
-export function renderWater(water, theme, bounds) {
+export function renderWater(water, theme, bounds, width, height) {
     if (!water || water.length === 0) return [];
 
     return water.map((waterBody, index) => {
@@ -127,7 +127,7 @@ export function renderWater(water, theme, bounds) {
 
         if (isArea) {
             // Render as polygon for water areas
-            const points = geometryToPolygon(waterBody.geometry, bounds);
+            const points = geometryToPolygon(waterBody.geometry, bounds, width, height);
             if (!points) return null;
 
             return {
@@ -139,7 +139,7 @@ export function renderWater(water, theme, bounds) {
             };
         } else {
             // Render as path for waterways (rivers, streams)
-            const pathData = geometryToPath(waterBody.geometry, bounds);
+            const pathData = geometryToPath(waterBody.geometry, bounds, width, height);
             if (!pathData) return null;
 
             return {
@@ -163,11 +163,11 @@ export function renderWater(water, theme, bounds) {
  * @param {Object} bounds - Coordinate bounds
  * @returns {Array} Array of React SVG polygon elements
  */
-export function renderParks(parks, theme, bounds) {
+export function renderParks(parks, theme, bounds, width, height) {
     if (!parks || parks.length === 0) return [];
 
     return parks.map((park, index) => {
-        const points = geometryToPolygon(park.geometry, bounds);
+        const points = geometryToPolygon(park.geometry, bounds, width, height);
 
         if (!points) return null;
 
@@ -210,7 +210,7 @@ export function sortRoadsByImportance(roads) {
  * @param {Object} theme - Theme configuration
  * @returns {Object} Object containing arrays of SVG elements for each layer
  */
-export function renderMapElements(osmData, theme) {
+export function renderMapElements(osmData, theme, width, height) {
     if (!osmData || !osmData.bounds) {
         return { parks: [], water: [], roads: [] };
     }
@@ -221,8 +221,8 @@ export function renderMapElements(osmData, theme) {
     const sortedRoads = sortRoadsByImportance(roads);
 
     return {
-        parks: renderParks(parks, theme, bounds),
-        water: renderWater(water, theme, bounds),
-        roads: renderRoads(sortedRoads, theme, bounds),
+        parks: renderParks(parks, theme, bounds, width, height),
+        water: renderWater(water, theme, bounds, width, height),
+        roads: renderRoads(sortedRoads, theme, bounds, width, height),
     };
 }

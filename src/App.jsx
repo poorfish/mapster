@@ -16,6 +16,11 @@ function App() {
 
     // Theme state
     const [currentTheme, setCurrentTheme] = useState('feature_based')
+    const [fontFamily, setFontFamily] = useState('Inter')
+
+    // Poster Layout state
+    const [orientation, setOrientation] = useState('portrait')
+    const [aspectRatio, setAspectRatio] = useState('3:4')
 
     // Map data state
     const [mapData, setMapData] = useState(null)
@@ -41,9 +46,12 @@ function App() {
     }, [])
 
     const handleThemeChange = useCallback((theme) => setCurrentTheme(theme), [])
+    const handleFontChange = useCallback((font) => setFontFamily(font), [])
     const handleCityChange = useCallback((city) => setCity(city), [])
     const handleCountryChange = useCallback((val) => setCountry(val), [])
     const handleDistanceChange = useCallback((dist) => setDistance(dist), [])
+    const handleOrientationChange = useCallback((orient) => setOrientation(orient), [])
+    const handleAspectRatioChange = useCallback((ratio) => setAspectRatio(ratio), [])
 
     return (
         <div className="app-container">
@@ -63,12 +71,18 @@ function App() {
                         city={city}
                         country={country}
                         theme={currentTheme}
+                        fontFamily={fontFamily}
+                        orientation={orientation}
+                        aspectRatio={aspectRatio}
                         mapData={mapData}
                         isLoading={isLoading}
                         onThemeChange={handleThemeChange}
+                        onFontChange={handleFontChange}
                         onCityChange={handleCityChange}
                         onCountryChange={handleCountryChange}
                         onDistanceChange={handleDistanceChange}
+                        onOrientationChange={handleOrientationChange}
+                        onAspectRatioChange={handleAspectRatioChange}
                     />
                 </SplitPane>
             </main>

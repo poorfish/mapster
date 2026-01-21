@@ -270,6 +270,54 @@ export const themes = {
         road_tertiary: "#4D4D4D",
         road_residential: "#666666",
         road_default: "#4D4D4D"
+    },
+
+    midnight_gold: {
+        name: "Midnight Gold",
+        description: "Deep black background with brushed gold accents - ultimate luxury",
+        bg: "#050505",
+        text: "#D4AF37",
+        gradient_color: "#050505",
+        water: "#0A0A0A",
+        parks: "#080808",
+        road_motorway: "#D4AF37",
+        road_primary: "#C5A028",
+        road_secondary: "#B69119",
+        road_tertiary: "#A7820A",
+        road_residential: "#8E6F00",
+        road_default: "#A7820A"
+    },
+
+    emerald_city: {
+        name: "Emerald City",
+        description: "Rich dark green with silver highlights - organic and premium",
+        bg: "#061A14",
+        text: "#D0D0D0",
+        gradient_color: "#061A14",
+        water: "#04120E",
+        parks: "#08241B",
+        road_motorway: "#00FF7F",
+        road_primary: "#20B2AA",
+        road_secondary: "#2E8B57",
+        road_tertiary: "#3CB371",
+        road_residential: "#66CDAA",
+        road_default: "#3CB371"
+    },
+
+    nordic_light: {
+        name: "Nordic Light",
+        description: "Clean whites and soft grays - Scandinavian minimalism",
+        bg: "#F9F9F9",
+        text: "#2E3440",
+        gradient_color: "#F9F9F9",
+        water: "#E5E9F0",
+        parks: "#ECEFF4",
+        road_motorway: "#2E3440",
+        road_primary: "#3B4252",
+        road_secondary: "#434C5E",
+        road_tertiary: "#4C566A",
+        road_residential: "#D8DEE9",
+        road_default: "#4C566A"
     }
 };
 

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import './PreviewPanel.css'
 import PosterRenderer from './PosterRenderer'
 import { exportSVG, exportPNG, generateFilename } from '../utils/exportUtils'
@@ -10,12 +10,18 @@ function PreviewPanel({
     city,
     country,
     theme,
+    fontFamily,
     mapData,
     isLoading,
+    orientation,
+    aspectRatio,
     onThemeChange,
+    onFontChange,
     onCityChange,
     onCountryChange,
-    onDistanceChange
+    onDistanceChange,
+    onOrientationChange,
+    onAspectRatioChange
 }) {
     const [downloadMenuOpen, setDownloadMenuOpen] = useState(false)
     const [isExporting, setIsExporting] = useState(false)
@@ -66,6 +72,8 @@ function PreviewPanel({
         setRenderedParams({ center: mapCenter, distance: distance })
     }
 
+
+
     return (
         <div className="preview-panel">
             <div className="preview-header">
@@ -84,7 +92,7 @@ function PreviewPanel({
                     {isOutOfSync && <span className="sync-hint-inline">Changes detected</span>}
                 </div>
 
-                <div className="preview-actions">
+                <div className="preview-header-right">
                     <div className="download-wrapper">
                         <button
                             className="action-button primary"
@@ -122,48 +130,131 @@ function PreviewPanel({
                         city={city}
                         country={country}
                         theme={theme}
+                        fontFamily={fontFamily}
                         mapData={mapData}
                         isLoading={isLoading}
                         refreshKey={refreshKey}
+                        orientation={orientation}
+                        aspectRatio={aspectRatio}
                         onParamsRendered={setRenderedParams}
                     />
                 </div>
 
                 <div className="preview-footer-settings glass">
-                    <div className="footer-setting wide">
-                        <div className="setting-label">Location Labels</div>
-                        <div className="footer-input-row">
-                            <input
-                                type="text"
-                                className="footer-input"
-                                placeholder="City Name"
-                                value={city}
-                                onChange={(e) => onCityChange(e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                className="footer-input"
-                                placeholder="Country/Region"
-                                value={country}
-                                onChange={(e) => onCountryChange(e.target.value)}
-                            />
+                    {/* LAYOUT Section */}
+                    <div className="settings-section">
+                        <div className="section-header">
+                            <span className="section-title">Layout</span>
+                        </div>
+                        <div className="footer-setting">
+                            <div className="setting-label">Orientation</div>
+                            <div className="toggle-group">
+                                <button
+                                    className={`toggle-btn ${orientation === 'portrait' ? 'active' : ''}`}
+                                    onClick={() => onOrientationChange('portrait')}
+                                >
+                                    Portrait
+                                </button>
+                                <button
+                                    className={`toggle-btn ${orientation === 'landscape' ? 'active' : ''}`}
+                                    onClick={() => onOrientationChange('landscape')}
+                                >
+                                    Landscape
+                                </button>
+                            </div>
+                        </div>
+                        <div className="footer-setting">
+                            <div className="setting-label">Aspect Ratio</div>
+                            <select
+                                className="ratio-select"
+                                value={aspectRatio}
+                                onChange={(e) => onAspectRatioChange(e.target.value)}
+                            >
+                                <option value="2:3">2:3 (Classic)</option>
+                                <option value="3:4">3:4 (Standard)</option>
+                                <option value="4:5">4:5 (Modern)</option>
+                                <option value="1:1">1:1 (Square)</option>
+                            </select>
                         </div>
                     </div>
 
                     <div className="footer-divider" />
 
-                    <div className="footer-setting">
-                        <div className="setting-label">Theme: <span>{getTheme(theme).name}</span></div>
-                        <div className="theme-dots-row">
-                            {themeNames.map(name => (
-                                <button
-                                    key={name}
-                                    className={`theme-dot-mini ${theme === name ? 'active' : ''}`}
-                                    onClick={() => onThemeChange(name)}
-                                    style={{ backgroundColor: getTheme(name).accent_primary || getTheme(name).road_primary }}
-                                    title={getTheme(name).name}
+                    {/* LABELS Section */}
+                    <div className="settings-section">
+                        <div className="section-header">
+                            <span className="section-title">Labels</span>
+                        </div>
+                        <div className="footer-setting">
+                            <div className="input-group">
+                                <div className="setting-label">City</div>
+                                <input
+                                    type="text"
+                                    className="footer-input"
+                                    placeholder="City Name"
+                                    value={city}
+                                    onChange={(e) => onCityChange(e.target.value)}
                                 />
-                            ))}
+                            </div>
+                            <div className="input-group">
+                                <div className="setting-label">Country</div>
+                                <input
+                                    type="text"
+                                    className="footer-input"
+                                    placeholder="Country/Region"
+                                    value={country}
+                                    onChange={(e) => onCountryChange(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="footer-divider" />
+
+                    {/* TYPOGRAPHY Section */}
+                    <div className="settings-section">
+                        <div className="section-header">
+                            <span className="section-title">Typography</span>
+                        </div>
+                        <div className="footer-setting">
+                            <div className="setting-label">Font Family</div>
+                            <select
+                                className="font-select"
+                                value={fontFamily}
+                                onChange={(e) => onFontChange(e.target.value)}
+                            >
+                                <option value="Inter">Inter (Sans)</option>
+                                <option value="'Playfair Display'">Playfair Display (Serif)</option>
+                                <option value="Montserrat">Montserrat (Modern)</option>
+                                <option value="'Courier Prime'">Courier Prime (Mono)</option>
+                                <option value="'Outfit'">Outfit (Geometric)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="footer-divider" />
+
+                    {/* THEME Section */}
+                    <div className="settings-section">
+                        <div className="section-header">
+                            <span className="section-title">Theme</span>
+                        </div>
+                        <div className="footer-setting">
+                            <div className="setting-label">{getTheme(theme).name}</div>
+                            <div className="theme-dots-container">
+                                {themeNames.map(name => {
+                                    const t = getTheme(name);
+                                    return (
+                                        <button
+                                            key={name}
+                                            className={`theme-dot ${theme === name ? 'active' : ''}`}
+                                            onClick={() => onThemeChange(name)}
+                                            style={{ background: t.bg, '--dot-accent': t.road_primary }}
+                                            title={t.name}
+                                        />
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 </div>

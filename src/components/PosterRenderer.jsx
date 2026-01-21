@@ -4,7 +4,26 @@ import { fetchOSMData } from '../utils/MapDataFetcher'
 import { renderMapElements } from '../utils/SVGRenderer'
 import './PosterRenderer.css'
 
-function PosterRenderer({ mapCenter, distance, city, country, theme, mapData, isLoading, refreshKey, onParamsRendered }) {
+function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily, mapData, isLoading, refreshKey, orientation, aspectRatio, onParamsRendered }) {
+    // Calculate dimensions based on aspect ratio and orientation
+    const parts = aspectRatio.split(':').map(Number)
+    const ratioW = orientation === 'portrait' ? parts[0] : parts[1]
+    const ratioH = orientation === 'portrait' ? parts[1] : parts[0]
+
+    let baseWidth, baseHeight
+    if (orientation === 'portrait') {
+        baseHeight = 800
+        baseWidth = (ratioW / ratioH) * baseHeight
+    } else {
+        baseWidth = 800
+        baseHeight = (ratioH / ratioW) * baseWidth
+    }
+
+    const width = baseWidth
+    const height = baseHeight
+    const centerX = width / 2
+    const centerY = height / 2
+
     const currentTheme = getTheme(theme)
     const [osmData, setOsmData] = useState(null)
     const [loading, setLoading] = useState(false)
@@ -44,8 +63,9 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, mapData, is
     // Render SVG elements from OSM data
     const svgElements = useMemo(() => {
         if (!osmData) return { parks: [], water: [], roads: [] }
-        return renderMapElements(osmData, currentTheme)
-    }, [osmData, currentTheme])
+        // Pass dynamic width and height to SVG transformer
+        return renderMapElements(osmData, currentTheme, width, height)
+    }, [osmData, currentTheme, width, height])
 
     const [lat, lon] = mapCenter
     const coords = lat >= 0
@@ -74,14 +94,14 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, mapData, is
                 </div>
             )}
 
-            <div className="poster-svg-container" style={{ background: currentTheme.bg }}>
+            <div className="poster-svg-container" style={{ background: currentTheme.bg, aspectRatio: `${width}/${height}`, maxWidth: orientation === 'landscape' ? '100%' : '500px' }}>
                 <svg
-                    viewBox="0 0 600 800"
+                    viewBox={`0 0 ${width} ${height}`}
                     className="poster-svg"
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     {/* Background */}
-                    <rect width="600" height="800" fill={currentTheme.bg} />
+                    <rect width={width} height={height} fill={currentTheme.bg} />
 
                     {/* Map content */}
                     <g id="map-content">
@@ -132,10 +152,10 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, mapData, is
                         {/* Show placeholder if no data yet */}
                         {!osmData && !loading && (
                             <>
-                                <circle cx="300" cy="400" r="150" fill="none" stroke={currentTheme.road_primary} strokeWidth="2" opacity="0.3" />
-                                <circle cx="300" cy="400" r="100" fill="none" stroke={currentTheme.road_secondary} strokeWidth="1.5" opacity="0.3" />
-                                <circle cx="300" cy="400" r="50" fill="none" stroke={currentTheme.road_tertiary} strokeWidth="1" opacity="0.3" />
-                                <text x="300" y="400" textAnchor="middle" fill={currentTheme.text} opacity="0.2" fontSize="14">
+                                <circle cx={centerX} cy={centerY} r="150" fill="none" stroke={currentTheme.road_primary} strokeWidth="2" opacity="0.3" />
+                                <circle cx={centerX} cy={centerY} r="100" fill="none" stroke={currentTheme.road_secondary} strokeWidth="1.5" opacity="0.3" />
+                                <circle cx={centerX} cy={centerY} r="50" fill="none" stroke={currentTheme.road_tertiary} strokeWidth="1" opacity="0.3" />
+                                <text x={centerX} y={centerY} textAnchor="middle" fill={currentTheme.text} opacity="0.2" fontSize="14">
                                     Map data will render here
                                 </text>
                             </>
@@ -154,65 +174,65 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, mapData, is
                         </linearGradient>
                     </defs>
 
-                    <rect width="600" height="200" y="0" fill="url(#topFade)" />
-                    <rect width="600" height="200" y="600" fill="url(#bottomFade)" />
+                    <rect width={width} height={height * 0.25} y="0" fill="url(#topFade)" />
+                    <rect width={width} height={height * 0.25} y={height * 0.75} fill="url(#bottomFade)" />
 
                     {/* Typography */}
                     <text
-                        x="300"
-                        y="680"
+                        x={centerX}
+                        y={height * 0.85}
                         textAnchor="middle"
                         fill={currentTheme.text}
-                        fontSize="48"
+                        fontSize={orientation === 'landscape' ? "36" : "48"}
                         fontWeight="700"
                         letterSpacing="12"
-                        fontFamily="Inter, sans-serif"
+                        fontFamily={fontFamily}
                     >
                         {city.toUpperCase().split('').join('  ')}
                     </text>
 
                     <line
-                        x1="240"
-                        y1="695"
-                        x2="360"
-                        y2="695"
+                        x1={centerX - 60}
+                        y1={height * 0.87}
+                        x2={centerX + 60}
+                        y2={height * 0.87}
                         stroke={currentTheme.text}
                         strokeWidth="1"
                     />
 
                     <text
-                        x="300"
-                        y="720"
+                        x={centerX}
+                        y={height * 0.90}
                         textAnchor="middle"
                         fill={currentTheme.text}
-                        fontSize="18"
+                        fontSize={orientation === 'landscape' ? "14" : "18"}
                         fontWeight="300"
-                        fontFamily="Inter, sans-serif"
+                        fontFamily={fontFamily}
                     >
                         {country.toUpperCase()}
                     </text>
 
                     <text
-                        x="300"
-                        y="745"
+                        x={centerX}
+                        y={height * 0.93}
                         textAnchor="middle"
                         fill={currentTheme.text}
                         fontSize="12"
                         opacity="0.7"
-                        fontFamily="Inter, sans-serif"
+                        fontFamily={fontFamily}
                     >
                         {coords}
                     </text>
 
                     {/* Attribution */}
                     <text
-                        x="590"
-                        y="790"
+                        x={width - 10}
+                        y={height - 10}
                         textAnchor="end"
                         fill={currentTheme.text}
                         fontSize="8"
                         opacity="0.5"
-                        fontFamily="Inter, sans-serif"
+                        fontFamily={fontFamily}
                     >
                         © OpenStreetMap contributors
                     </text>

@@ -177,52 +177,111 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
                     <rect width={width} height={height * 0.25} y="0" fill="url(#topFade)" />
                     <rect width={width} height={height * 0.25} y={height * 0.75} fill="url(#bottomFade)" />
 
-                    {/* Typography */}
-                    <text
-                        x={centerX}
-                        y={height * 0.85}
-                        textAnchor="middle"
-                        fill={currentTheme.text}
-                        fontSize={orientation === 'landscape' ? "36" : "48"}
-                        fontWeight="700"
-                        letterSpacing="12"
-                        fontFamily={fontFamily}
-                    >
-                        {city.toUpperCase().split('').join('  ')}
-                    </text>
+                    {/* Typography Rendering Logic */}
+                    {(() => {
+                        const cityText = city.toUpperCase();
+                        const words = cityText.split(/\s+/);
+                        const charCount = cityText.length;
 
-                    <line
-                        x1={centerX - 60}
-                        y1={height * 0.87}
-                        x2={centerX + 60}
-                        y2={height * 0.87}
-                        stroke={currentTheme.text}
-                        strokeWidth="1"
-                    />
+                        // Adaptive configuration
+                        let baseFontSize = orientation === 'landscape' ? 36 : 48;
+                        let letterSpacingValue = 12;
 
-                    <text
-                        x={centerX}
-                        y={height * 0.90}
-                        textAnchor="middle"
-                        fill={currentTheme.text}
-                        fontSize={orientation === 'landscape' ? "14" : "18"}
-                        fontWeight="300"
-                        fontFamily={fontFamily}
-                    >
-                        {country.toUpperCase()}
-                    </text>
+                        // Decision for multi-line
+                        const isMultiLine = charCount > 12 && words.length > 1;
+                        const lines = isMultiLine ? words : [cityText];
 
-                    <text
-                        x={centerX}
-                        y={height * 0.93}
-                        textAnchor="middle"
-                        fill={currentTheme.text}
-                        fontSize="12"
-                        opacity="0.7"
-                        fontFamily={fontFamily}
-                    >
-                        {coords}
-                    </text>
+                        // Calculate scaling for very long single words or lines
+                        const padding = 60; // Increased safety margin from edges
+                        const maxLineWidth = width - (padding * 2);
+                        let currentFontSize = baseFontSize;
+
+                        // Conservative width estimation:
+                        // 1. Each character is roughly 0.7 * fontSize (conservative for bold fonts)
+                        // 2. We inject two spaces between each char: ' '. Each space is roughly 0.3 * fontSize.
+                        // 3. letter-spacing is applied to every character except the last one.
+                        const getLineWidth = (text, fSize, spacing) => {
+                            const charWidth = text.length * (fSize * 0.7);
+                            const injectedSpacesWidth = (text.length - 1) * 2 * (fSize * 0.3);
+                            const totalSpacing = (text.length - 1 + (text.length * 2)) * spacing;
+                            return charWidth + injectedSpacesWidth + totalSpacing;
+                        };
+
+                        // Scale down if any line is too wide
+                        let maxLineW = 0;
+                        lines.forEach(line => {
+                            maxLineW = Math.max(maxLineW, getLineWidth(line, currentFontSize, letterSpacingValue));
+                        });
+
+                        if (maxLineW > maxLineWidth) {
+                            const scale = maxLineWidth / maxLineW;
+                            currentFontSize = Math.max(currentFontSize * scale, 24);
+                            letterSpacingValue = Math.max(letterSpacingValue * scale, 4);
+                        }
+
+                        // Vertical positioning
+                        const lineHeight = currentFontSize * 1.2;
+                        const totalTextHeight = lines.length * lineHeight;
+                        const cityYStart = height * 0.85 - (totalTextHeight / 2) + (lineHeight / 2);
+
+                        return (
+                            <>
+                                <text
+                                    x={centerX}
+                                    y={cityYStart}
+                                    textAnchor="middle"
+                                    fill={currentTheme.text}
+                                    fontSize={currentFontSize}
+                                    fontWeight="700"
+                                    fontFamily={fontFamily}
+                                    style={{ letterSpacing: `${letterSpacingValue}px` }}
+                                >
+                                    {lines.map((line, i) => (
+                                        <tspan
+                                            key={i}
+                                            x={centerX}
+                                            dy={i === 0 ? 0 : lineHeight}
+                                        >
+                                            {line.split('').join('  ')}
+                                        </tspan>
+                                    ))}
+                                </text>
+
+                                <line
+                                    x1={centerX - 60}
+                                    y1={height * 0.88 + (lines.length > 1 ? (lines.length - 1) * lineHeight / 2 : 0)}
+                                    x2={centerX + 60}
+                                    y2={height * 0.88 + (lines.length > 1 ? (lines.length - 1) * lineHeight / 2 : 0)}
+                                    stroke={currentTheme.text}
+                                    strokeWidth="1"
+                                />
+
+                                <text
+                                    x={centerX}
+                                    y={height * 0.91 + (lines.length > 1 ? (lines.length - 1) * lineHeight / 2 : 0)}
+                                    textAnchor="middle"
+                                    fill={currentTheme.text}
+                                    fontSize={orientation === 'landscape' ? "14" : "18"}
+                                    fontWeight="300"
+                                    fontFamily={fontFamily}
+                                >
+                                    {country.toUpperCase()}
+                                </text>
+
+                                <text
+                                    x={centerX}
+                                    y={height * 0.94 + (lines.length > 1 ? (lines.length - 1) * lineHeight / 2 : 0)}
+                                    textAnchor="middle"
+                                    fill={currentTheme.text}
+                                    fontSize="12"
+                                    opacity="0.7"
+                                    fontFamily={fontFamily}
+                                >
+                                    {coords}
+                                </text>
+                            </>
+                        );
+                    })()}
 
                     {/* Attribution */}
                     <text

@@ -1,0 +1,77 @@
+.split-pane {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.split-pane-left,
+.split-pane-right {
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.split-pane-divider {
+    width: 8px;
+    background: var(--bg-primary);
+    cursor: col-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: background var(--transition-fast);
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    z-index: 10;
+}
+
+.split-pane-divider:hover,
+.split-pane-divider.dragging {
+    background: var(--bg-tertiary);
+}
+
+.split-pane-divider:hover .divider-handle,
+.split-pane-divider.dragging .divider-handle {
+    opacity: 1;
+}
+
+.divider-handle {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0.5;
+    transition: opacity var(--transition-fast);
+}
+
+.divider-line {
+    width: 2px;
+    height: 16px;
+    background: var(--text-secondary);
+    border-radius: 1px;
+}
+
+/* Active dragging state */
+.split-pane-divider.dragging::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -2px;
+    right: -2px;
+    bottom: 0;
+    background: var(--accent-secondary);
+    opacity: 0.1;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.1;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+}

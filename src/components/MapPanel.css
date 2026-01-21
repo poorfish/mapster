@@ -1,0 +1,102 @@
+.map-panel {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #080808;
+}
+
+.map-container {
+    width: 100%;
+    height: 100%;
+}
+
+.map-search-centered {
+    position: absolute;
+    top: var(--spacing-xl);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 100%;
+    max-width: 500px;
+    padding: 0 var(--spacing-md);
+}
+
+.map-controls-bottom {
+    position: absolute;
+    bottom: var(--spacing-xl);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-full);
+    z-index: 1000;
+    min-width: 300px;
+    background: rgba(10, 10, 10, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+}
+
+.map-control-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.control-label span {
+    color: var(--accent-primary);
+    margin-left: 4px;
+}
+
+.map-radius-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    outline: none;
+}
+
+.map-radius-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+}
+
+/* Override Leaflet styles for gray theme */
+.leaflet-container {
+    background: #f5f5f5;
+}
+
+.leaflet-control-zoom {
+    border: none !important;
+}
+
+.leaflet-control-zoom a {
+    background: rgba(255, 255, 255, 0.8) !important;
+    color: #333 !important;
+    border: 1px solid #ddd !important;
+    backdrop-filter: blur(10px);
+}
+
+.leaflet-control-zoom a:hover {
+    background: var(--accent-primary) !important;
+    color: var(--bg-primary) !important;
+}
+
+.leaflet-bar {
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+}

@@ -1,0 +1,17 @@
+.app-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    background: var(--bg-primary);
+}
+
+.app-main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.app-main.full-height {
+    height: 100vh;
+}

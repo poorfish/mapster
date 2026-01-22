@@ -162,7 +162,7 @@ function PreviewPanel({
                 {/* Right: GitHub Link */}
                 <div className="header-right">
                     <a
-                        href="https://github.com/poorfish/maptoposter"
+                        href="https://github.com/poorfish/mapster"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="github-link"

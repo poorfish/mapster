@@ -30,9 +30,6 @@ function LocationSearch({ onLocationSelect }) {
                         format: 'json',
                         limit: 5,
                         addressdetails: 1
-                    },
-                    headers: {
-                        'User-Agent': 'Mapster/1.0'
                     }
                 })
                 setResults(response.data)

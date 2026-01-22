@@ -17,8 +17,10 @@
 
 ## 快速开始
 
+### 一键部署到 Vercel
 [![使用 Vercel 部署](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fpoorfish%2Fmapster)
 
+### 本地部署
 ```bash
 # 安装依赖
 npm install

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { getTheme } from '../data/themes'
-import { fetchOSMData } from '../utils/MapDataFetcher'
+import { fetchOSMData, fetchOSMDataProgressive, fetchOSMDataProgressiveBatched } from '../utils/MapDataFetcher'
 import { renderMapElements } from '../utils/SVGRenderer'
 import './PosterRenderer.css'
 
@@ -27,6 +27,7 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
     const currentTheme = getTheme(theme)
     const [osmData, setOsmData] = useState(null)
     const [loading, setLoading] = useState(false)
+    const [loadingStage, setLoadingStage] = useState(null) // 'major' | 'minor' | null
     const [error, setError] = useState(null)
 
     const fetchData = async () => {
@@ -34,22 +35,43 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
 
         const [lat, lon] = mapCenter
         setLoading(true)
+        setLoadingStage('major')
         setError(null)
 
         try {
             console.log(`Fetching OSM data for ${city}...`)
-            const data = await fetchOSMData(lat, lon, distance)
-            setOsmData(data)
+
+            // Use progressive loading for better UX (Strategy 1: Aggressive Sampling)
+            await fetchOSMDataProgressive(
+                lat,
+                lon,
+                distance,
+                (stage, data) => {
+                    if (stage === 'major') {
+                        // Stage 1: Display major roads quickly
+                        console.log('[PosterRenderer] Stage 1 complete: Major features loaded')
+                        setOsmData(data)
+                        setLoadingStage('minor')
+                        setLoading(false) // Main loading overlay removed
+                    } else if (stage === 'complete') {
+                        // Stage 2: Update with complete (sampled) data
+                        console.log('[PosterRenderer] Stage 2 complete: All roads loaded')
+                        setOsmData(data)
+                        setLoadingStage(null)
+                    }
+                }
+            )
 
             if (onParamsRendered) {
                 onParamsRendered({ center: mapCenter, distance })
             }
+
             console.log('OSM data loaded successfully')
         } catch (err) {
             console.error('Failed to fetch OSM data:', err)
             setError(err.message)
-        } finally {
             setLoading(false)
+            setLoadingStage(null)
         }
     }
 
@@ -74,10 +96,32 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
 
     return (
         <div className="poster-renderer">
+            {/* Main loading overlay - Stage 1 (major roads) */}
             {(loading || isLoading) && (
                 <div className="loading-overlay">
                     <div className="spinner"></div>
-                    <p>{error ? 'Retrying with different server...' : 'Generating poster...'}</p>
+                    <p>{error ? 'Retrying with different server...' : 'Loading map structure...'}</p>
+                </div>
+            )}
+
+            {/* Subtle loading indicator - Stage 2 (minor roads) */}
+            {!loading && loadingStage === 'minor' && (
+                <div style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    background: 'rgba(0, 0, 0, 0.7)',
+                    color: '#fff',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    zIndex: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                }}>
+                    <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>🔄</span>
+                    Loading details...
                 </div>
             )}
 

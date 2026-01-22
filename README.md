@@ -1,6 +1,8 @@
-# Mapster
+![Banner](public/banner.png)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fpoorfish%2Fmapster)
+English | [简体中文](README_CN.md)
+
+# Mapster
 
 A React web application for creating beautiful, minimalist map posters for any location in the world. Search for a city, customize the theme and layout, then download your poster as SVG or PNG.
 
@@ -14,6 +16,8 @@ A React web application for creating beautiful, minimalist map posters for any l
 - **Export Options** - Download as high-resolution PNG or scalable SVG
 
 ## Quick Start
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fpoorfish%2Fmapster)
 
 ```bash
 # Install dependencies

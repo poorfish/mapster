@@ -26,6 +26,55 @@
     padding: 0 var(--spacing-md);
 }
 
+.map-preview-btn-container {
+    position: absolute;
+    top: var(--spacing-xl);
+    right: var(--spacing-xl);
+    z-index: 1000;
+}
+
+.map-preview-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 8px 18px;
+    background: rgba(10, 10, 10, 0.7);
+    backdrop-filter: blur(20px);
+    color: var(--accent-primary);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.map-preview-btn:hover {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: var(--accent-primary);
+}
+
+.map-preview-btn.stale {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    border-color: var(--accent-primary);
+    animation: map-gold-glow 2s infinite;
+}
+
+@keyframes map-gold-glow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.6);
+    }
+
+    70% {
+        box-shadow: 0 0 0 12px rgba(212, 175, 55, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+    }
+}
+
 .map-controls-bottom {
     position: absolute;
     bottom: var(--spacing-xl);

@@ -149,13 +149,13 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
                             />
                         ))}
 
-                        {/* Show placeholder if no data yet */}
+                        {/* Show placeholder if no data yet - gold colors matching midnight_blue theme */}
                         {!osmData && !loading && (
                             <>
-                                <circle cx={centerX} cy={centerY} r="150" fill="none" stroke={currentTheme.road_primary} strokeWidth="2" opacity="0.3" />
-                                <circle cx={centerX} cy={centerY} r="100" fill="none" stroke={currentTheme.road_secondary} strokeWidth="1.5" opacity="0.3" />
-                                <circle cx={centerX} cy={centerY} r="50" fill="none" stroke={currentTheme.road_tertiary} strokeWidth="1" opacity="0.3" />
-                                <text x={centerX} y={centerY} textAnchor="middle" fill={currentTheme.text} opacity="0.2" fontSize="14">
+                                <circle cx={centerX} cy={centerY} r="150" fill="none" stroke="#D4AF37" strokeWidth="2" opacity="0.3" />
+                                <circle cx={centerX} cy={centerY} r="100" fill="none" stroke="#C9A961" strokeWidth="1.5" opacity="0.3" />
+                                <circle cx={centerX} cy={centerY} r="50" fill="none" stroke="#BEA38B" strokeWidth="1" opacity="0.3" />
+                                <text x={centerX} y={centerY} textAnchor="middle" fill="#D4AF37" opacity="0.35" fontSize="14">
                                     Map data will render here
                                 </text>
                             </>
@@ -191,20 +191,23 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
                         const isMultiLine = charCount > 12 && words.length > 1;
                         const lines = isMultiLine ? words : [cityText];
 
-                        // Calculate scaling for very long single words or lines
-                        const padding = 60; // Increased safety margin from edges
-                        const maxLineWidth = width - (padding * 2);
+                        // Horizontal padding - safety margin from left/right edges for entire info section
+                        const HORIZONTAL_PADDING = Math.max(width * 0.08, 40); // At least 8% of width or 40px
+                        const maxLineWidth = width - (HORIZONTAL_PADDING * 2);
                         let currentFontSize = baseFontSize;
 
-                        // Conservative width estimation:
-                        // 1. Each character is roughly 0.7 * fontSize (conservative for bold fonts)
-                        // 2. We inject two spaces between each char: ' '. Each space is roughly 0.3 * fontSize.
-                        // 3. letter-spacing is applied to every character except the last one.
+                        // More conservative width estimation with safety margin:
+                        // Account for: base char width + injected spaces + letter-spacing
                         const getLineWidth = (text, fSize, spacing) => {
-                            const charWidth = text.length * (fSize * 0.7);
-                            const injectedSpacesWidth = (text.length - 1) * 2 * (fSize * 0.3);
-                            const totalSpacing = (text.length - 1 + (text.length * 2)) * spacing;
-                            return charWidth + injectedSpacesWidth + totalSpacing;
+                            // Each character base width (more conservative estimate for bold fonts)
+                            const charWidth = text.length * (fSize * 0.8);
+                            // Two spaces injected between each char: '  '
+                            const injectedSpacesWidth = (text.length - 1) * 2 * (fSize * 0.35);
+                            // Letter-spacing applied
+                            const totalSpacing = (text.length - 1) * spacing;
+                            // Add extra safety margin (10%)
+                            const totalWidth = charWidth + injectedSpacesWidth + totalSpacing;
+                            return totalWidth * 1.1; // 10% safety buffer
                         };
 
                         // Scale down if any line is too wide
@@ -215,14 +218,43 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
 
                         if (maxLineW > maxLineWidth) {
                             const scale = maxLineWidth / maxLineW;
-                            currentFontSize = Math.max(currentFontSize * scale, 24);
-                            letterSpacingValue = Math.max(letterSpacingValue * scale, 4);
+                            currentFontSize = Math.max(currentFontSize * scale, 20); // Minimum 20px
+                            letterSpacingValue = Math.max(letterSpacingValue * scale, 3);
                         }
 
-                        // Vertical positioning
+                        // LAYOUT STRATEGY: Poster Info Section as a whole
+                        // The info section (city + divider + country + coords) is anchored to the bottom
+                        // with fixed spacing between elements. When city text grows, section expands upward.
+
                         const lineHeight = currentFontSize * 1.2;
-                        const totalTextHeight = lines.length * lineHeight;
-                        const cityYStart = height * 0.85 - (totalTextHeight / 2) + (lineHeight / 2);
+
+                        // Font sizes
+                        const countryFontSize = orientation === 'landscape' ? 14 : 18;
+                        const coordsFontSize = 12;
+
+                        // Fixed spacing constants for info section
+                        const BOTTOM_PADDING = height * 0.05; // Fixed margin from poster bottom
+                        const GAP_COORDS_TO_COUNTRY = coordsFontSize * 1.8; // Gap between coords and country
+                        const GAP_COUNTRY_TO_DIVIDER = countryFontSize * 1.5; // Gap from country baseline to divider
+                        const GAP_DIVIDER_TO_CITY = countryFontSize * 1.5; // Gap from divider to city (same as above for symmetry)
+                        const GAP_CITY_LINES = lineHeight; // Gap between city name lines
+
+                        // BUILD FROM BOTTOM TO TOP:
+
+                        // 1. Coordinates (bottom element)
+                        const coordsY = height - BOTTOM_PADDING;
+
+                        // 2. Country name
+                        const countryY = coordsY - GAP_COORDS_TO_COUNTRY;
+
+                        // 3. Divider line
+                        const dividerY = countryY - GAP_COUNTRY_TO_DIVIDER;
+
+                        // 4. City name (multi-line, grows upward)
+                        // The last line of city name is GAP_DIVIDER_TO_CITY above the divider
+                        const cityLastLineY = dividerY - GAP_DIVIDER_TO_CITY;
+                        // First line position depends on number of lines
+                        const cityYStart = cityLastLineY - (lines.length - 1) * GAP_CITY_LINES;
 
                         return (
                             <>
@@ -247,21 +279,31 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
                                     ))}
                                 </text>
 
-                                <line
-                                    x1={centerX - 60}
-                                    y1={height * 0.88 + (lines.length > 1 ? (lines.length - 1) * lineHeight / 2 : 0)}
-                                    x2={centerX + 60}
-                                    y2={height * 0.88 + (lines.length > 1 ? (lines.length - 1) * lineHeight / 2 : 0)}
-                                    stroke={currentTheme.text}
-                                    strokeWidth="1"
-                                />
+                                {/* Divider line - width matches country name */}
+                                {(() => {
+                                    // Estimate country text width
+                                    // For uppercase text with font-weight 300, approximately 0.6 * fontSize per character
+                                    const countryTextWidth = country.toUpperCase().length * countryFontSize * 0.6;
+                                    const dividerHalfWidth = countryTextWidth / 2;
+
+                                    return (
+                                        <line
+                                            x1={centerX - dividerHalfWidth}
+                                            y1={dividerY}
+                                            x2={centerX + dividerHalfWidth}
+                                            y2={dividerY}
+                                            stroke={currentTheme.text}
+                                            strokeWidth="1"
+                                        />
+                                    );
+                                })()}
 
                                 <text
                                     x={centerX}
-                                    y={height * 0.91 + (lines.length > 1 ? (lines.length - 1) * lineHeight / 2 : 0)}
+                                    y={countryY}
                                     textAnchor="middle"
                                     fill={currentTheme.text}
-                                    fontSize={orientation === 'landscape' ? "14" : "18"}
+                                    fontSize={countryFontSize}
                                     fontWeight="300"
                                     fontFamily={fontFamily}
                                 >
@@ -270,10 +312,10 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
 
                                 <text
                                     x={centerX}
-                                    y={height * 0.94 + (lines.length > 1 ? (lines.length - 1) * lineHeight / 2 : 0)}
+                                    y={coordsY}
                                     textAnchor="middle"
                                     fill={currentTheme.text}
-                                    fontSize="12"
+                                    fontSize={coordsFontSize}
                                     opacity="0.7"
                                     fontFamily={fontFamily}
                                 >

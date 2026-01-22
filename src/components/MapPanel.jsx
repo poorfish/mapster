@@ -12,7 +12,7 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
-function MapPanel({ center, zoom, distance, onMapChange, onLocationSelect, onDistanceChange }) {
+function MapPanel({ center, zoom, distance, isOutOfSync, onMapChange, onLocationSelect, onDistanceChange, onUpdatePreview }) {
     const mapRef = useRef(null)
     const mapInstanceRef = useRef(null)
     const circleRef = useRef(null)
@@ -146,6 +146,24 @@ function MapPanel({ center, zoom, distance, onMapChange, onLocationSelect, onDis
             <div className="map-search-centered">
                 <LocationSearch onLocationSelect={handleLocationSelect} />
             </div>
+
+            {/* Preview Button - Top Right */}
+            {onUpdatePreview && (
+                <div className="map-preview-btn-container">
+                    <button
+                        className={`map-preview-btn glass ${isOutOfSync ? 'stale' : ''}`}
+                        onClick={onUpdatePreview}
+                        title={isOutOfSync ? 'Re-generate Poster' : 'Generate Poster'}
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        {isOutOfSync ? 'Re-generate' : 'Generate'}
+                    </button>
+                </div>
+            )}
+
             <div ref={mapRef} className="map-container"></div>
             <div className="map-controls-bottom glass">
                 <div className="map-control-item">

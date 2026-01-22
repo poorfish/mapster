@@ -15,7 +15,7 @@ function App() {
     const [country, setCountry] = useState('United Kingdom')
 
     // Theme state
-    const [currentTheme, setCurrentTheme] = useState('feature_based')
+    const [currentTheme, setCurrentTheme] = useState('midnight_blue')
     const [fontFamily, setFontFamily] = useState('Inter')
 
     // Poster Layout state
@@ -25,6 +25,15 @@ function App() {
     // Map data state
     const [mapData, setMapData] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
+
+    // Preview sync state
+    const [isOutOfSync, setIsOutOfSync] = useState(false)
+    const [updatePreviewHandler, setUpdatePreviewHandler] = useState(null)
+
+    const handleSyncStatusChange = useCallback((outOfSync, handler) => {
+        setIsOutOfSync(outOfSync)
+        setUpdatePreviewHandler(() => handler)
+    }, [])
 
     // Memoize handlers
     const handleMapChange = useCallback((center, zoom) => {
@@ -61,9 +70,11 @@ function App() {
                         center={mapCenter}
                         zoom={mapZoom}
                         distance={distance}
+                        isOutOfSync={isOutOfSync}
                         onMapChange={handleMapChange}
                         onLocationSelect={handleLocationSelect}
                         onDistanceChange={handleDistanceChange}
+                        onUpdatePreview={updatePreviewHandler}
                     />
                     <PreviewPanel
                         mapCenter={mapCenter}
@@ -83,6 +94,7 @@ function App() {
                         onDistanceChange={handleDistanceChange}
                         onOrientationChange={handleOrientationChange}
                         onAspectRatioChange={handleAspectRatioChange}
+                        onSyncStatusChange={handleSyncStatusChange}
                     />
                 </SplitPane>
             </main>

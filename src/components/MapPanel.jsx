@@ -30,9 +30,14 @@ function MapPanel({ center, zoom, isOutOfSync, hasGenerated, onMapChange, onLoca
             const map = L.map(mapRef.current, {
                 center: center,
                 zoom: zoom,
-                zoomControl: true,
+                zoomControl: false, // Handle zoom control manually for custom positioning
                 attributionControl: false, // Disable default attribution to avoid duplicates
             })
+
+            // Add zoom control manually to bottom-left
+            L.control.zoom({
+                position: 'bottomleft'
+            }).addTo(map)
 
             // Add tile layer - CartoDB Dark Matter (Dark Gray)
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {

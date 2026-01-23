@@ -15,6 +15,10 @@ A React web application for creating beautiful, minimalist map posters for any l
 - **Flexible Layouts** - Portrait/landscape orientation, multiple aspect ratios (2:3, 3:4, 4:5, 1:1)
 - **Export Options** - Download as high-resolution PNG or scalable SVG
 
+## Screenshots
+
+![Mapster Application](screenshots/app-screenshot.png)
+
 ## Quick Start
 
 ### Deploy with Vercel

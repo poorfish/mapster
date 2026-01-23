@@ -279,6 +279,10 @@
 
 .settings-section {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    /* Vertical gap between setting blocks */
 }
 
 .section-header {
@@ -287,7 +291,6 @@
     gap: 0.5rem;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 0.25rem;
-    margin-bottom: 0.5rem;
     width: 100%;
 }
 
@@ -303,6 +306,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    /* Gap between Label and Control */
 }
 
 .footer-setting.wide {
@@ -329,14 +333,16 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
+    /* Standardized to match .footer-setting */
 }
 
 .footer-input {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
-    padding: 0.5rem 0.7rem;
-    /* Compact padding */
+    padding: 0 0.7rem;
+    height: 38px;
+    /* Unified height */
     border-radius: var(--radius-md);
     font-size: 0.8rem;
     width: 100%;
@@ -360,8 +366,9 @@
     background-position: right 0.8rem center;
     background-size: 12px;
     border: 1px solid var(--border-color);
-    padding: 0.6rem 2.2rem 0.6rem 0.6rem;
-    /* Reduced horizontal padding */
+    padding: 0 2.2rem 0 0.6rem;
+    height: 38px;
+    /* Unified height */
     border-radius: var(--radius-md);
     font-size: 0.8rem;
     /* Slightly smaller font to fit more */
@@ -389,8 +396,9 @@
     background-position: right 0.8rem center;
     background-size: 12px;
     border: 1px solid var(--border-color);
-    padding: 0.6rem 2.2rem 0.6rem 0.6rem;
-    /* Reduced horizontal padding */
+    padding: 0 2.2rem 0 0.6rem;
+    height: 38px;
+    /* Unified height */
     border-radius: var(--radius-md);
     font-size: 0.8rem;
     width: 100%;
@@ -406,12 +414,13 @@
     border-radius: var(--radius-md);
     padding: 2px;
     width: 100%;
-    /* Ensure full width */
+    height: 38px;
+    /* Unified height */
 }
 
 .toggle-btn {
     flex: 1;
-    height: 32px;
+    height: 100%;
     padding: 0;
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);

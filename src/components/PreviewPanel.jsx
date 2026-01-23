@@ -248,26 +248,24 @@ function PreviewPanel({
                                 <span className="section-title">Labels</span>
                             </div>
                             <div className="footer-setting">
-                                <div className="input-group">
-                                    <div className="setting-label">City</div>
-                                    <input
-                                        type="text"
-                                        className="footer-input"
-                                        placeholder="City Name"
-                                        value={city}
-                                        onChange={(e) => onCityChange(e.target.value)}
-                                    />
-                                </div>
-                                <div className="input-group">
-                                    <div className="setting-label">Country</div>
-                                    <input
-                                        type="text"
-                                        className="footer-input"
-                                        placeholder="Country/Region"
-                                        value={country}
-                                        onChange={(e) => onCountryChange(e.target.value)}
-                                    />
-                                </div>
+                                <div className="setting-label">City</div>
+                                <input
+                                    type="text"
+                                    className="footer-input"
+                                    placeholder="City Name"
+                                    value={city}
+                                    onChange={(e) => onCityChange(e.target.value)}
+                                />
+                            </div>
+                            <div className="footer-setting">
+                                <div className="setting-label">Country</div>
+                                <input
+                                    type="text"
+                                    className="footer-input"
+                                    placeholder="Country/Region"
+                                    value={country}
+                                    onChange={(e) => onCountryChange(e.target.value)}
+                                />
                             </div>
                         </div>
 

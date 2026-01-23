@@ -99,17 +99,24 @@
 }
 
 .leaflet-control-zoom a {
-    background: rgba(10, 10, 10, 0.8) !important;
-    color: var(--accent-primary) !important;
-    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    background: rgba(20, 20, 20, 0.6) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-color) !important;
     backdrop-filter: blur(10px);
     transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 18px !important;
+    line-height: 1 !important;
 }
 
 .leaflet-control-zoom a:hover {
-    background: rgba(212, 175, 55, 0.15) !important;
-    color: var(--accent-primary) !important;
-    border-color: var(--accent-primary) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--text-muted) !important;
 }
 
 .leaflet-bar {

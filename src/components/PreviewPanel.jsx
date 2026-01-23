@@ -27,6 +27,7 @@ function PreviewPanel({
     const [downloadMenuOpen, setDownloadMenuOpen] = useState(false)
     const [isExporting, setIsExporting] = useState(false)
     const [refreshKey, setRefreshKey] = useState(0)
+    const [activeTab, setActiveTab] = useState(null) // 'layout', 'labels', 'typography', 'theme'
     const themeNames = getThemeNames()
 
     // Store the params that are currently rendered in the poster
@@ -193,123 +194,261 @@ function PreviewPanel({
                 </div>
 
                 <div className="preview-footer-settings glass">
-                    {/* LAYOUT Section */}
-                    <div className="settings-section">
-                        <div className="section-header">
-                            <span className="section-title">Layout</span>
-                        </div>
-                        <div className="footer-setting">
-                            <div className="setting-label">Orientation</div>
-                            <div className="toggle-group">
-                                <button
-                                    className={`toggle-btn ${orientation === 'portrait' ? 'active' : ''}`}
-                                    onClick={() => onOrientationChange('portrait')}
+                    {/* Desktop Settings Content (HIDDEN ON MOBILE) */}
+                    <div className="desktop-settings-only">
+                        {/* LAYOUT Section */}
+                        <div className="settings-section">
+                            <div className="section-header">
+                                <span className="section-title">Layout</span>
+                            </div>
+                            <div className="footer-setting">
+                                <div className="setting-label">Orientation</div>
+                                <div className="toggle-group">
+                                    <button
+                                        className={`toggle-btn ${orientation === 'portrait' ? 'active' : ''}`}
+                                        onClick={() => onOrientationChange('portrait')}
+                                    >
+                                        Portrait
+                                    </button>
+                                    <button
+                                        className={`toggle-btn ${orientation === 'landscape' ? 'active' : ''}`}
+                                        onClick={() => onOrientationChange('landscape')}
+                                    >
+                                        Landscape
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="footer-setting">
+                                <div className="setting-label">Aspect Ratio</div>
+                                <select
+                                    className="ratio-select"
+                                    value={aspectRatio}
+                                    onChange={(e) => onAspectRatioChange(e.target.value)}
                                 >
-                                    Portrait
-                                </button>
-                                <button
-                                    className={`toggle-btn ${orientation === 'landscape' ? 'active' : ''}`}
-                                    onClick={() => onOrientationChange('landscape')}
+                                    <option value="2:3">2:3 (Classic)</option>
+                                    <option value="3:4">3:4 (Standard)</option>
+                                    <option value="4:5">4:5 (Modern)</option>
+                                    <option value="1:1">1:1 (Square)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="footer-divider" />
+
+                        {/* LABELS Section */}
+                        <div className="settings-section">
+                            <div className="section-header">
+                                <span className="section-title">Labels</span>
+                            </div>
+                            <div className="footer-setting">
+                                <div className="input-group">
+                                    <div className="setting-label">City</div>
+                                    <input
+                                        type="text"
+                                        className="footer-input"
+                                        placeholder="City Name"
+                                        value={city}
+                                        onChange={(e) => onCityChange(e.target.value)}
+                                    />
+                                </div>
+                                <div className="input-group">
+                                    <div className="setting-label">Country</div>
+                                    <input
+                                        type="text"
+                                        className="footer-input"
+                                        placeholder="Country/Region"
+                                        value={country}
+                                        onChange={(e) => onCountryChange(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="footer-divider" />
+
+                        {/* TYPOGRAPHY Section */}
+                        <div className="settings-section">
+                            <div className="section-header">
+                                <span className="section-title">Typography</span>
+                            </div>
+                            <div className="footer-setting">
+                                <div className="setting-label">Font Family</div>
+                                <select
+                                    className="font-select"
+                                    value={fontFamily}
+                                    onChange={(e) => onFontChange(e.target.value)}
                                 >
-                                    Landscape
-                                </button>
+                                    <option value="Inter">Inter (Sans)</option>
+                                    <option value="'Playfair Display'">Playfair Display (Serif)</option>
+                                    <option value="Montserrat">Montserrat (Modern)</option>
+                                    <option value="'Courier Prime'">Courier Prime (Mono)</option>
+                                    <option value="'Outfit'">Outfit (Geometric)</option>
+                                </select>
                             </div>
                         </div>
-                        <div className="footer-setting">
-                            <div className="setting-label">Aspect Ratio</div>
-                            <select
-                                className="ratio-select"
-                                value={aspectRatio}
-                                onChange={(e) => onAspectRatioChange(e.target.value)}
-                            >
-                                <option value="2:3">2:3 (Classic)</option>
-                                <option value="3:4">3:4 (Standard)</option>
-                                <option value="4:5">4:5 (Modern)</option>
-                                <option value="1:1">1:1 (Square)</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div className="footer-divider" />
+                        <div className="footer-divider" />
 
-                    {/* LABELS Section */}
-                    <div className="settings-section">
-                        <div className="section-header">
-                            <span className="section-title">Labels</span>
-                        </div>
-                        <div className="footer-setting">
-                            <div className="input-group">
-                                <div className="setting-label">City</div>
-                                <input
-                                    type="text"
-                                    className="footer-input"
-                                    placeholder="City Name"
-                                    value={city}
-                                    onChange={(e) => onCityChange(e.target.value)}
-                                />
+                        {/* THEME Section */}
+                        <div className="settings-section">
+                            <div className="section-header">
+                                <span className="section-title">Theme</span>
                             </div>
-                            <div className="input-group">
-                                <div className="setting-label">Country</div>
-                                <input
-                                    type="text"
-                                    className="footer-input"
-                                    placeholder="Country/Region"
-                                    value={country}
-                                    onChange={(e) => onCountryChange(e.target.value)}
-                                />
+                            <div className="footer-setting">
+                                <div className="setting-label">{getTheme(theme).name}</div>
+                                <div className="theme-dots-container">
+                                    {themeNames.map(name => {
+                                        const t = getTheme(name);
+                                        return (
+                                            <button
+                                                key={name}
+                                                className={`theme-dot ${theme === name ? 'active' : ''}`}
+                                                onClick={() => onThemeChange(name)}
+                                                style={{ background: t.bg, '--dot-accent': t.road_primary }}
+                                                title={t.name}
+                                            />
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="footer-divider" />
-
-                    {/* TYPOGRAPHY Section */}
-                    <div className="settings-section">
-                        <div className="section-header">
-                            <span className="section-title">Typography</span>
-                        </div>
-                        <div className="footer-setting">
-                            <div className="setting-label">Font Family</div>
-                            <select
-                                className="font-select"
-                                value={fontFamily}
-                                onChange={(e) => onFontChange(e.target.value)}
-                            >
-                                <option value="Inter">Inter (Sans)</option>
-                                <option value="'Playfair Display'">Playfair Display (Serif)</option>
-                                <option value="Montserrat">Montserrat (Modern)</option>
-                                <option value="'Courier Prime'">Courier Prime (Mono)</option>
-                                <option value="'Outfit'">Outfit (Geometric)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="footer-divider" />
-
-                    {/* THEME Section */}
-                    <div className="settings-section">
-                        <div className="section-header">
-                            <span className="section-title">Theme</span>
-                        </div>
-                        <div className="footer-setting">
-                            <div className="setting-label">{getTheme(theme).name}</div>
-                            <div className="theme-dots-container">
-                                {themeNames.map(name => {
-                                    const t = getTheme(name);
-                                    return (
-                                        <button
-                                            key={name}
-                                            className={`theme-dot ${theme === name ? 'active' : ''}`}
-                                            onClick={() => onThemeChange(name)}
-                                            style={{ background: t.bg, '--dot-accent': t.road_primary }}
-                                            title={t.name}
-                                        />
-                                    );
-                                })}
-                            </div>
-                        </div>
+                    {/* Mobile Navigation (VISIBLE ON MOBILE ONLY) */}
+                    <div className="mobile-nav">
+                        <button
+                            className={`nav-item ${activeTab === 'layout' ? 'active' : ''}`}
+                            onClick={() => setActiveTab(activeTab === 'layout' ? null : 'layout')}
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="9" y1="3" x2="9" y2="21"></line>
+                            </svg>
+                            <span>Layout</span>
+                        </button>
+                        <button
+                            className={`nav-item ${activeTab === 'labels' ? 'active' : ''}`}
+                            onClick={() => setActiveTab(activeTab === 'labels' ? null : 'labels')}
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            <span>Labels</span>
+                        </button>
+                        <button
+                            className={`nav-item ${activeTab === 'typography' ? 'active' : ''}`}
+                            onClick={() => setActiveTab(activeTab === 'typography' ? null : 'typography')}
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                                <line x1="9" y1="20" x2="15" y2="20"></line>
+                                <line x1="12" y1="4" x2="12" y2="20"></line>
+                            </svg>
+                            <span>Fonts</span>
+                        </button>
+                        <button
+                            className={`nav-item ${activeTab === 'theme' ? 'active' : ''}`}
+                            onClick={() => setActiveTab(activeTab === 'theme' ? null : 'theme')}
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 2a10 10 0 0 0-10 10c0 5.514 4.486 10 10 10s10-4.486 10-10A10 10 0 0 0 12 2zm1 17.938V18h-2v1.938A8.02 8.02 0 0 1 4.062 13H6v-2H4.062A8.02 8.02 0 0 1 11 4.062V6h2V4.062A8.02 8.02 0 0 1 19.938 11H18v2h1.938A8.02 8.02 0 0 1 13 19.938z"></path>
+                            </svg>
+                            <span>Theme</span>
+                        </button>
                     </div>
                 </div>
+
+                {/* Bottom Sheet for Mobile */}
+                {activeTab && (
+                    <div className="bottom-sheet glass active">
+                        <div className="bottom-sheet-header">
+                            <div className="drag-indicator"></div>
+                            <button className="close-btn" onClick={() => setActiveTab(null)}>&times;</button>
+                        </div>
+                        <div className="bottom-sheet-content">
+                            {activeTab === 'layout' && (
+                                <div className="mobile-settings-menu">
+                                    <div className="menu-group">
+                                        <label>Orientation</label>
+                                        <div className="toggle-group full-width">
+                                            <button className={`toggle-btn ${orientation === 'portrait' ? 'active' : ''}`} onClick={() => onOrientationChange('portrait')}>Portrait</button>
+                                            <button className={`toggle-btn ${orientation === 'landscape' ? 'active' : ''}`} onClick={() => onOrientationChange('landscape')}>Landscape</button>
+                                        </div>
+                                    </div>
+                                    <div className="menu-group">
+                                        <label>Aspect Ratio</label>
+                                        <select className="ratio-select full-width" value={aspectRatio} onChange={(e) => onAspectRatioChange(e.target.value)}>
+                                            <option value="2:3">2:3 (Classic)</option>
+                                            <option value="3:4">3:4 (Standard)</option>
+                                            <option value="4:5">4:5 (Modern)</option>
+                                            <option value="1:1">1:1 (Square)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'labels' && (
+                                <div className="mobile-settings-menu">
+                                    <div className="menu-group">
+                                        <label>City Name</label>
+                                        <input type="text" className="footer-input" value={city} onChange={(e) => onCityChange(e.target.value)} />
+                                    </div>
+                                    <div className="menu-group">
+                                        <label>Country / Region</label>
+                                        <input type="text" className="footer-input" value={country} onChange={(e) => onCountryChange(e.target.value)} />
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'typography' && (
+                                <div className="mobile-settings-menu">
+                                    <div className="menu-group">
+                                        <label>Font Family</label>
+                                        <div className="font-grid">
+                                            {['Inter', "'Playfair Display'", 'Montserrat', "'Courier Prime'", "'Outfit'"].map(font => (
+                                                <button
+                                                    key={font}
+                                                    className={`font-chip ${fontFamily === font ? 'active' : ''}`}
+                                                    onClick={() => onFontChange(font)}
+                                                    style={{ fontFamily: font }}
+                                                >
+                                                    {font.replace(/'/g, '').split(' ')[0]}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'theme' && (
+                                <div className="mobile-settings-menu">
+                                    <div className="menu-group">
+                                        <label>Current: <span>{getTheme(theme).name}</span></label>
+                                        <div className="mobile-theme-grid">
+                                            {themeNames.map(name => {
+                                                const t = getTheme(name);
+                                                return (
+                                                    <button
+                                                        key={name}
+                                                        className={`mobile-theme-card ${theme === name ? 'active' : ''}`}
+                                                        onClick={() => onThemeChange(name)}
+                                                    >
+                                                        <div className="theme-preview" style={{ background: t.bg }}>
+                                                            <div className="accent-line" style={{ background: t.road_primary }}></div>
+                                                        </div>
+                                                        <span>{t.name}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )

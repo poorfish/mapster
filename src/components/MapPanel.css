@@ -89,7 +89,7 @@
 
 /* Override Leaflet styles for gray theme */
 .leaflet-container {
-    background: #f5f5f5;
+    background: var(--bg-primary);
     width: 100% !important;
     height: 100% !important;
 }

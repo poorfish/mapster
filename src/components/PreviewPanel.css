@@ -455,3 +455,217 @@
     transform: scale(1.25);
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
+
+/* Mobile responsiveness */
+.mobile-nav {
+    display: none;
+    width: 100%;
+    justify-content: space-around;
+    padding: 10px 0;
+    height: 60px;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.nav-item.active {
+    color: var(--accent-primary);
+}
+
+.nav-item svg {
+    padding: 4px;
+    border-radius: 8px;
+    transition: all var(--transition-fast);
+}
+
+.nav-item.active svg {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.desktop-settings-only {
+    display: flex;
+    width: 100%;
+    gap: var(--spacing-lg);
+}
+
+.bottom-sheet {
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    border-radius: 24px 24px 0 0;
+    z-index: 1000;
+    transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.bottom-sheet.active {
+    bottom: 60px;
+    /* Above nav bar */
+}
+
+.bottom-sheet-header {
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.drag-indicator {
+    width: 40px;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+}
+
+.close-btn {
+    position: absolute;
+    right: 16px;
+    top: 8px;
+    font-size: 24px;
+    color: var(--text-muted);
+}
+
+.bottom-sheet-content {
+    padding: 0 24px 32px;
+    overflow-y: auto;
+}
+
+.mobile-settings-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.menu-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.menu-group label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+}
+
+.full-width {
+    width: 100% !important;
+}
+
+.mobile-theme-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.mobile-theme-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all var(--transition-fast);
+}
+
+.mobile-theme-card.active {
+    border-color: var(--accent-primary);
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.theme-preview {
+    height: 60px;
+    border-radius: 6px;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.theme-preview .accent-line {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    height: 4px;
+    border-radius: 2px;
+}
+
+.mobile-theme-card span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.font-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.font-chip {
+    padding: 10px 16px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+.font-chip.active {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    border-color: var(--accent-primary);
+}
+
+@media (max-width: 768px) {
+    .preview-header {
+        height: 50px;
+        padding: 0 var(--spacing-md);
+    }
+
+    .preview-header .header-center h2 {
+        display: none;
+    }
+
+    .preview-content {
+        padding: var(--spacing-md);
+    }
+
+    .desktop-settings-only {
+        display: none;
+    }
+
+    .mobile-nav {
+        display: flex;
+    }
+
+    .preview-footer-settings {
+        padding: 0;
+        height: 60px;
+        min-height: 60px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .preview-content-container {
+        padding-bottom: 20px;
+    }
+}

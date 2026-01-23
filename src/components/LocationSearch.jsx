@@ -8,6 +8,7 @@ function LocationSearch({ onLocationSelect }) {
     const [isSearching, setIsSearching] = useState(false)
     const [showResults, setShowResults] = useState(false)
     const searchTimeoutRef = useRef(null)
+    const containerRef = useRef(null)
 
     useEffect(() => {
         if (query.length < 3) {
@@ -49,6 +50,19 @@ function LocationSearch({ onLocationSelect }) {
         }
     }, [query])
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setShowResults(false)
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [])
+
     const handleSelect = (result) => {
         const city = result.address?.city ||
             result.address?.town ||
@@ -70,7 +84,7 @@ function LocationSearch({ onLocationSelect }) {
     }
 
     return (
-        <div className="location-search">
+        <div className="location-search" ref={containerRef}>
             <div className="search-input-wrapper glass">
                 <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <circle cx="11" cy="11" r="8"></circle>

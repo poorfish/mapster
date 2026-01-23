@@ -1,4 +1,4 @@
-![Banner](public/banner.png)
+![Banner](public/banner.jpg)
 
 English | [简体中文](README_CN.md)
 

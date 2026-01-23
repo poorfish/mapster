@@ -1,4 +1,4 @@
-![Banner](public/banner.png)
+![Banner](public/banner.jpg)
 
 [English](README.md) | 简体中文
 
@@ -38,10 +38,9 @@ npm run dev
 ## 使用方法
 
 1. **搜索** 城市或平移地图到您想要的位置
-2. 使用滑块 **调整** 海报半径
-3. **点击 "Refresh Preview"** 以生成地图海报
-4. 在设置面板中 **自定义** 主题、字体和布局
-5. **下载** 为 PNG 或 SVG
+2. **点击 "Generate"** 生成地图海报
+3. 在设置面板中 **自定义** 主题、字体和布局
+4. **下载** 为 PNG 或 SVG
 
 ## 可用主题
 

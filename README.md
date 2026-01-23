@@ -38,10 +38,9 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 ## Usage
 
 1. **Search** for a city or pan the map to your desired location
-2. **Adjust** the poster radius using the slider
-3. **Click "Refresh Preview"** to generate the map poster
-4. **Customize** theme, font, and layout in the settings panel
-5. **Download** as PNG or SVG
+2. **Click "Generate"** to create the map poster
+3. **Customize** theme, font, and layout in the settings panel
+4. **Download** as PNG or SVG
 
 ## Available Themes
 

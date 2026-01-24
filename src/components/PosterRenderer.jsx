@@ -123,17 +123,35 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
                 </div>
             )}
 
-            <div className="poster-svg-container" style={{ background: currentTheme.bg, aspectRatio: `${width}/${height}`, maxWidth: orientation === 'landscape' ? '100%' : '500px' }}>
+            <div className="poster-svg-container" style={{ aspectRatio: `${width}/${height}` }}>
                 <svg
+                    width={width}
+                    height={height}
                     viewBox={`0 0 ${width} ${height}`}
                     className="poster-svg"
                     xmlns="http://www.w3.org/2000/svg"
                 >
-                    {/* Background */}
-                    <rect width={width} height={height} fill={currentTheme.bg} />
+                    {/* Background with rounded corners */}
+                    <rect width={width} height={height} fill={currentTheme.bg} rx="12" ry="12" />
 
-                    {/* Map content */}
-                    <g id="map-content">
+                    <defs>
+                        {/* Clip path to ensure all map content respects rounded corners */}
+                        <clipPath id="posterClip">
+                            <rect width={width} height={height} rx="12" ry="12" />
+                        </clipPath>
+
+                        <linearGradient id="bottomFade" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor={currentTheme.gradient_color} stopOpacity="0" />
+                            <stop offset="100%" stopColor={currentTheme.gradient_color} stopOpacity="1" />
+                        </linearGradient>
+                        <linearGradient id="topFade" x1="0%" y1="100%" x2="0%" y2="0%">
+                            <stop offset="0%" stopColor={currentTheme.gradient_color} stopOpacity="0" />
+                            <stop offset="100%" stopColor={currentTheme.gradient_color} stopOpacity="1" />
+                        </linearGradient>
+                    </defs>
+
+                    {/* Map content with clipping */}
+                    <g id="map-content" clipPath="url(#posterClip)">
                         {/* Buildings layer (very bottom) */}
                         {svgElements.buildings.map(element => (
                             <polygon
@@ -202,20 +220,8 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
                         )}
                     </g>
 
-                    {/* Bottom gradient fade */}
-                    <defs>
-                        <linearGradient id="bottomFade" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor={currentTheme.gradient_color} stopOpacity="0" />
-                            <stop offset="100%" stopColor={currentTheme.gradient_color} stopOpacity="1" />
-                        </linearGradient>
-                        <linearGradient id="topFade" x1="0%" y1="100%" x2="0%" y2="0%">
-                            <stop offset="0%" stopColor={currentTheme.gradient_color} stopOpacity="0" />
-                            <stop offset="100%" stopColor={currentTheme.gradient_color} stopOpacity="1" />
-                        </linearGradient>
-                    </defs>
-
-                    <rect width={width} height={height * 0.25} y="0" fill="url(#topFade)" />
-                    <rect width={width} height={height * 0.25} y={height * 0.75} fill="url(#bottomFade)" />
+                    <rect width={width} height={height * 0.25} y="0" fill="url(#topFade)" clipPath="url(#posterClip)" />
+                    <rect width={width} height={height * 0.25} y={height * 0.75} fill="url(#bottomFade)" clipPath="url(#posterClip)" />
 
                     {/* Typography Rendering Logic */}
                     {(() => {

@@ -247,9 +247,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: auto;
-    padding: var(--spacing-xl);
-    padding-bottom: 160px;
+    overflow: hidden;
+    padding: 80px;
+    padding-bottom: 280px;
+    padding-top: 40px;
+    /* Accommodate navigation bar and floating settings */
 
     &::-webkit-scrollbar {
         display: none;
@@ -695,13 +697,27 @@
     .preview-content-container {
         flex: 1;
         min-height: 0;
-        height: calc(100dvh - 54px);
-        padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+        height: auto;
+        position: relative;
+        padding-bottom: calc(72px + var(--spacing-md) + env(safe-area-inset-bottom, 0px));
+        display: flex;
+        flex-direction: column;
     }
 
     .preview-content {
-        padding: var(--spacing-md);
+        position: relative;
+        padding: var(--spacing-lg);
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
         height: 100%;
+        overflow: hidden;
+    }
+
+    .poster-renderer {
+        max-width: 100% !important;
     }
 
     .desktop-settings-only {

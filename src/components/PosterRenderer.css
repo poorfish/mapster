@@ -1,17 +1,27 @@
 .poster-renderer {
     position: relative;
     width: 100%;
-    max-width: 600px;
+    height: 100%;
     margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .poster-svg-container {
-    width: 100%;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
     margin: 0 auto;
     border-radius: var(--radius-lg);
-    overflow: hidden;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     transition: transform var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important;
 }
 
 .poster-svg-container:hover {
@@ -19,9 +29,12 @@
 }
 
 .poster-svg {
-    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
     height: auto;
     display: block;
+    object-fit: contain;
 }
 
 .loading-overlay {

@@ -18,8 +18,12 @@ const ROAD_WIDTHS = {
     tertiary: 0.7,
     residential: 0.4,
     service: 0.3,
-    unclassified: 0.5,
-    default: 0.5,
+    unclassified: 0.3,
+    footway: 0.2,
+    cycleway: 0.2,
+    path: 0.2,
+    steps: 0.3,
+    default: 0.3,
 };
 
 /**
@@ -35,6 +39,10 @@ function getRoadColor(highwayType, theme) {
         residential: theme.road_residential,
         service: theme.road_residential,
         unclassified: theme.road_default,
+        footway: theme.road_tertiary || theme.road_default,
+        cycleway: theme.road_tertiary || theme.road_default,
+        path: theme.road_tertiary || theme.road_default,
+        steps: theme.road_tertiary || theme.road_default,
     };
 
     return typeMap[highwayType] || theme.road_default;
@@ -182,6 +190,33 @@ export function renderParks(parks, theme, bounds, width, height) {
 }
 
 /**
+ * Render buildings as SVG polygon elements
+ * 
+ * @param {Array} buildings - Array of building elements from OSM
+ * @param {Object} theme - Theme configuration
+ * @param {Object} bounds - Coordinate bounds
+ * @returns {Array} Array of React SVG polygon elements
+ */
+export function renderBuildings(buildings, theme, bounds, width, height) {
+    if (!buildings || buildings.length === 0) return [];
+
+    return buildings.map((building, index) => {
+        const points = geometryToPolygon(building.geometry, bounds, width, height);
+
+        if (!points) return null;
+
+        return {
+            type: 'polygon',
+            key: `building-${index}`,
+            points,
+            fill: theme.road_default || '#333', // Use a subtle color for buildings
+            opacity: 0.15, // Keep them very subtle
+            stroke: 'none',
+        };
+    }).filter(Boolean);
+}
+
+/**
  * Sort roads by importance (render less important roads first, so major roads appear on top)
  */
 export function sortRoadsByImportance(roads) {
@@ -212,15 +247,16 @@ export function sortRoadsByImportance(roads) {
  */
 export function renderMapElements(osmData, theme, width, height) {
     if (!osmData || !osmData.bounds) {
-        return { parks: [], water: [], roads: [] };
+        return { parks: [], water: [], roads: [], buildings: [] };
     }
 
-    const { roads, water, parks, bounds } = osmData;
+    const { roads, water, parks, buildings, bounds } = osmData;
 
     // Sort roads by importance (render minor roads first)
     const sortedRoads = sortRoadsByImportance(roads);
 
     return {
+        buildings: renderBuildings(buildings || [], theme, bounds, width, height),
         parks: renderParks(parks, theme, bounds, width, height),
         water: renderWater(water, theme, bounds, width, height),
         roads: renderRoads(sortedRoads, theme, bounds, width, height),

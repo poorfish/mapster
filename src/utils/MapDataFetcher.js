@@ -38,12 +38,16 @@ function buildCombinedQuery(lat, lon, radius) {
     return `
         [out:json][timeout:60];
         (
-            way["highway"~"motorway|trunk|primary|secondary|tertiary|residential|service|unclassified"](around:${radius},${lat},${lon});
+            way["highway"~"motorway|trunk|primary|secondary|tertiary|residential|service|unclassified|footway|cycleway|path|track|steps"](around:${radius},${lat},${lon});
             way["natural"="water"](around:${radius},${lat},${lon});
             way["waterway"~"river|stream|canal"](around:${radius},${lat},${lon});
             relation["natural"="water"](around:${radius},${lat},${lon});
-            way["leisure"="park"](around:${radius},${lat},${lon});
-            way["landuse"~"grass|forest|recreation_ground"](around:${radius},${lat},${lon});
+            way["leisure"~"park|pitch|playground|garden|swimming_pool|track"](around:${radius},${lat},${lon});
+            way["landuse"~"grass|forest|recreation_ground|cemetery|allotments|village_green"](around:${radius},${lat},${lon});
+            way["man_made"~"pier|bridge"](around:${radius},${lat},${lon});
+            way["amenity"~"parking|fountain"](around:${radius},${lat},${lon});
+            way["area:highway"](around:${radius},${lat},${lon});
+            ${radius < 2600 ? `way["building"~".*"](around:${radius},${lat},${lon}); way["building:part"](around:${radius},${lat},${lon});` : ''}
         );
         out geom;
     `;
@@ -58,7 +62,10 @@ function buildMajorFeaturesQuery(lat, lon, radius) {
             way["highway"~"${coreRoads}"](around:${radius},${lat},${lon});
             way["natural"="water"](around:${radius},${lat},${lon});
             way["waterway"~"river|stream|canal"](around:${radius},${lat},${lon});
-            way["leisure"="park"](around:${radius},${lat},${lon});
+            way["leisure"~"park|pitch|playground|garden|swimming_pool|track"](around:${radius},${lat},${lon});
+            way["man_made"~"pier|bridge"](around:${radius},${lat},${lon});
+            way["amenity"~"parking|fountain"](around:${radius},${lat},${lon});
+            ${radius < 2600 ? `way["building"~".*"](around:${radius},${lat},${lon});` : ''}
         );
         out geom;
     `;
@@ -159,17 +166,28 @@ function simplifyGeometry(points, tolerance = 0.00001) {
 }
 
 /**
+ * Get dynamic simplification tolerance based on radius
+ */
+function getSimplifyTolerance(radius) {
+    if (radius < 500) return 0.000003;
+    if (radius < 1200) return 0.000008;
+    if (radius < 3000) return 0.000015;
+    return 0.00003;
+}
+
+/**
  * Filter elements by type from the combined result
  */
-function processElements(elements) {
+function processElements(elements, radius = 2000) {
     let roads = [];
     const water = [];
     const parks = [];
+    const buildings = [];
 
     // Optimization settings
     const MIN_PARK_NODES = 3;
-    const SIMPLIFY_TOLERANCE = 0.00002; // Roughly 2 meters
-    const DENSE_THRESHOLD = 5000;
+    const SIMPLIFY_TOLERANCE = getSimplifyTolerance(radius);
+    const DENSE_THRESHOLD = radius < 1500 ? 30000 : 8000;
 
     // If data is too dense, we filter out minor roads to keep performance high
     const isVeryDense = elements.length > DENSE_THRESHOLD;
@@ -203,10 +221,15 @@ function processElements(elements) {
                 el.geometry = simplifyGeometry(el.geometry, SIMPLIFY_TOLERANCE);
                 parks.push(el);
             }
+        } else if (tags.building || tags['building:part'] || tags.amenity === 'parking' || tags.amenity === 'fountain' || tags['area:highway']) {
+            // Simplify buildings more aggressively if there are many
+            const bTolerance = elements.length > 20000 ? SIMPLIFY_TOLERANCE * 2.5 : SIMPLIFY_TOLERANCE;
+            el.geometry = simplifyGeometry(el.geometry, bTolerance);
+            buildings.push(el);
         }
     });
 
-    return { roads, water, parks };
+    return { roads, water, parks, buildings };
 }
 
 /**
@@ -344,7 +367,7 @@ export async function fetchOSMData(lat, lon, distance) {
         const query = buildCombinedQuery(lat, lon, fetchRadius);
         const elements = await fetchFromOverpass(query);
 
-        const { roads, water, parks } = processElements(elements);
+        const { roads, water, parks, buildings } = processElements(elements, fetchRadius);
 
         // Use fixed bounds based on the request to ensure perfect centering
         const bounds = getRequestBounds(lat, lon, distance);
@@ -355,6 +378,7 @@ export async function fetchOSMData(lat, lon, distance) {
             roads,
             water,
             parks,
+            buildings,
             bounds,
         };
 
@@ -437,12 +461,13 @@ export async function fetchOSMDataProgressive(lat, lon, distance, onProgress) {
         console.log('[MapDataFetcher] Stage 1: Fetching major features...');
         const majorQuery = buildMajorFeaturesQuery(lat, lon, fetchRadius);
         const majorElements = await fetchFromOverpass(majorQuery);
-        const { roads: majorRoads, water, parks } = processElements(majorElements);
+        const { roads: majorRoads, water, parks, buildings: majorBuildings } = processElements(majorElements, fetchRadius);
 
         const majorData = {
             roads: majorRoads,
             water,
             parks,
+            buildings: majorBuildings,
             bounds
         };
 
@@ -473,13 +498,14 @@ export async function fetchOSMDataProgressive(lat, lon, distance, onProgress) {
             console.log('[MapDataFetcher] Stage 2: Fetching minor roads...');
             const minorQuery = buildMinorRoadsQuery(lat, lon, fetchRadius, isDense);
             const minorElements = await fetchFromOverpass(minorQuery);
-            const { roads: minorRoads } = processElements(minorElements);
+            const { roads: minorRoads, buildings: stage2Buildings } = processElements(minorElements, fetchRadius);
 
             // Merge data
             const completeData = {
                 roads: [...majorRoads, ...minorRoads],
                 water,
                 parks,
+                buildings: [...(majorData.buildings || []), ...(stage2Buildings || [])],
                 bounds
             };
 

@@ -90,7 +90,7 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
 
     // Render SVG elements from OSM data
     const svgElements = useMemo(() => {
-        if (!osmData) return { parks: [], water: [], roads: [] }
+        if (!osmData) return { parks: [], water: [], roads: [], buildings: [] }
         // Pass dynamic width and height to SVG transformer
         return renderMapElements(osmData, currentTheme, width, height)
     }, [osmData, currentTheme, width, height])
@@ -134,7 +134,18 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
 
                     {/* Map content */}
                     <g id="map-content">
-                        {/* Parks layer (bottom) */}
+                        {/* Buildings layer (very bottom) */}
+                        {svgElements.buildings.map(element => (
+                            <polygon
+                                key={element.key}
+                                points={element.points}
+                                fill={element.fill}
+                                opacity={element.opacity}
+                                stroke={element.stroke}
+                            />
+                        ))}
+
+                        {/* Parks layer */}
                         {svgElements.parks.map(element => (
                             <polygon
                                 key={element.key}

@@ -16,13 +16,45 @@
     max-height: 100%;
     margin: 0 auto;
     border-radius: var(--radius-lg);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    transition: transform var(--transition-normal);
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.45);
+    background: transparent !important;
+
+    /* Professional Shutter transition */
+    transition:
+        aspect-ratio 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        width 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent !important;
+    position: relative;
+    will-change: aspect-ratio;
 }
+
+/* Elegant Recomposition Entrance */
+.poster-svg {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    animation: poster-recompose 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes poster-recompose {
+    0% {
+        opacity: 0;
+        transform: scale(0.99) translateY(6px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
 
 .poster-svg-container:hover {
     transform: scale(1.02);

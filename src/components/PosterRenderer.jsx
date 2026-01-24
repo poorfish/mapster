@@ -125,6 +125,7 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
 
             <div className="poster-svg-container" style={{ aspectRatio: `${width}/${height}` }}>
                 <svg
+                    key={`${aspectRatio}-${orientation}`} /* Triggers the poster-reveal animation on layout change */
                     width={width}
                     height={height}
                     viewBox={`0 0 ${width} ${height}`}
@@ -148,6 +149,7 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
                             <stop offset="0%" stopColor={currentTheme.gradient_color} stopOpacity="0" />
                             <stop offset="100%" stopColor={currentTheme.gradient_color} stopOpacity="1" />
                         </linearGradient>
+
                     </defs>
 
                     {/* Map content with clipping */}

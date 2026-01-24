@@ -394,6 +394,7 @@ function PreviewPanel({
                                     <option value="Montserrat">Montserrat (Modern)</option>
                                     <option value="'Courier Prime'">Courier Prime (Mono)</option>
                                     <option value="'Outfit'">Outfit (Geometric)</option>
+                                    <option value="'Nunito'">Nunito (Rounded Bold)</option>
                                 </select>
                             </div>
                         </div>
@@ -560,7 +561,7 @@ function PreviewPanel({
                                     <div className="menu-group">
                                         <label>Font Family</label>
                                         <div className="font-grid">
-                                            {['Inter', "'Playfair Display'", 'Montserrat', "'Courier Prime'", "'Outfit'"].map(font => (
+                                            {['Inter', "'Playfair Display'", 'Montserrat', "'Courier Prime'", "'Outfit'", "'Nunito'"].map(font => (
                                                 <button
                                                     key={font}
                                                     className={`font-chip ${fontFamily === font ? 'active' : ''}`}

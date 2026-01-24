@@ -6,12 +6,43 @@
   <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>
-    // Only disable user-scaling on mobile devices to prevent map interaction interference
+    // Disable user-scaling on mobile devices
     if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
       var viewport = document.querySelector('meta[name="viewport"]');
       if (viewport) {
         viewport.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
       }
+
+      // Helper to check if event target is within the map
+      var isMapTarget = function (el) {
+        while (el) {
+          if (el.classList && el.classList.contains('leaflet-container')) return true;
+          el = el.parentElement;
+        }
+        return false;
+      };
+
+      // Force prevent zoom on iOS, but EXEMPT the map container
+      document.addEventListener('gesturestart', function (e) {
+        if (!isMapTarget(e.target)) {
+          e.preventDefault();
+        }
+      });
+
+      document.addEventListener('touchstart', function (event) {
+        if (event.touches.length > 1 && !isMapTarget(event.target)) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+
+      var lastTouchEnd = 0;
+      document.addEventListener('touchend', function (event) {
+        var now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300 && !isMapTarget(event.target)) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
     }
   </script>
   <meta name="description" content="Mapster - Generate beautiful, minimalist map posters for any city in the world" />

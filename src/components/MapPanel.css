@@ -144,3 +144,41 @@
     opacity: 1;
     color: rgba(255, 255, 255, 0.8) !important;
 }
+
+.map-zoom-level {
+    position: absolute;
+    bottom: 84px;
+    /* Positioned above the zoom buttons (32px*2 + spacing) */
+    left: 10px;
+    /* Match Leaflet's default left margin for controls */
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    padding: 6px 0;
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    backdrop-filter: blur(10px);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 700;
+    pointer-events: none;
+    /* Don't interfere with map clicks */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.map-zoom-level span:first-child {
+    font-size: 7px;
+    opacity: 0.6;
+    margin-bottom: 2px;
+}
+
+.map-zoom-level .zoom-value {
+    color: var(--text-secondary);
+    font-size: 12px;
+}

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './MapPanel.css'
@@ -17,6 +17,7 @@ function MapPanel({ center, zoom, isOutOfSync, hasGenerated, onMapChange, onLoca
     const mapInstanceRef = useRef(null)
     const markerRef = useRef(null)
     const resizeObserverRef = useRef(null)
+    const [currentZoom, setCurrentZoom] = useState(Math.round(zoom))
 
     // Store callbacks in ref to avoid re-initializing map listeners when handlers change
     const callbacksRef = useRef({ onMapChange, onLocationSelect })
@@ -80,6 +81,7 @@ function MapPanel({ center, zoom, isOutOfSync, hasGenerated, onMapChange, onLoca
             const handleMapUpdate = () => {
                 const newCenter = map.getCenter()
                 const newZoom = map.getZoom()
+                setCurrentZoom(Math.round(newZoom))
 
                 // Only trigger update if values actually changed to avoid unnecessary parent re-renders
                 callbacksRef.current.onMapChange([newCenter.lat, newCenter.lng], newZoom)
@@ -159,6 +161,12 @@ function MapPanel({ center, zoom, isOutOfSync, hasGenerated, onMapChange, onLoca
             </div>
 
             <div ref={mapRef} className="map-container"></div>
+
+            {/* Zoom Level Indicator */}
+            <div className="map-zoom-level glass">
+                <span>Zoom</span>
+                <span className="zoom-value">{currentZoom}</span>
+            </div>
 
             {/* Generate Button - Bottom Center */}
             {onUpdatePreview && (

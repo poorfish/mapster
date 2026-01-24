@@ -420,6 +420,14 @@ function PreviewPanel({
                     </div>
                 </div>
 
+                {/* Invisible overlay to close menu on outside click */}
+                {activeTab && (
+                    <div
+                        className="bottom-sheet-overlay"
+                        onClick={() => setActiveTab(null)}
+                    />
+                )}
+
                 {/* Bottom Sheet for Mobile */}
                 {activeTab && (
                     <div
@@ -522,7 +530,10 @@ function PreviewPanel({
                                                     <button
                                                         key={name}
                                                         className={`mobile-theme-card ${theme === name ? 'active' : ''}`}
-                                                        onClick={() => onThemeChange(name)}
+                                                        onClick={() => {
+                                                            onThemeChange(name);
+                                                            setActiveTab(null);
+                                                        }}
                                                     >
                                                         <div className="theme-preview" style={{ background: t.bg }}>
                                                             <div className="accent-line" style={{ background: t.road_primary }}></div>

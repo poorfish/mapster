@@ -688,9 +688,9 @@
         left: var(--spacing-md);
         right: var(--spacing-md);
         height: 72px;
-        background: rgba(10, 10, 10, 0.9) !important;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        background: rgba(10, 10, 10, 0.45) !important;
+        backdrop-filter: blur(28px) saturate(180%);
+        -webkit-backdrop-filter: blur(28px) saturate(180%);
         border: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
         z-index: 3000;
@@ -733,6 +733,14 @@
     .mobile-nav {
         display: flex;
     }
+}
+
+.bottom-sheet-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2500;
+    background: transparent;
+    cursor: default;
 }
 
 .bottom-sheet {

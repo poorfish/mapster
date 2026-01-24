@@ -646,6 +646,7 @@
 
     .preview-panel {
         height: 100vh !important;
+        height: 100dvh !important;
         position: relative;
         overflow: hidden;
     }
@@ -685,14 +686,14 @@
         bottom: 0;
         left: 0;
         right: 0;
-        height: 64px;
+        height: calc(64px + env(safe-area-inset-bottom, 0px));
         background: rgba(10, 10, 10, 0.9) !important;
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-top: 1px solid var(--border-color);
         z-index: 3000;
         display: flex !important;
-        padding: 0;
+        padding: 0 0 env(safe-area-inset-bottom, 0px) 0;
         margin: 0;
         border-radius: 0;
     }
@@ -710,9 +711,9 @@
     .preview-content-container {
         flex: 1;
         min-height: 0;
-        height: calc(100vh - 54px);
+        height: calc(100dvh - 54px);
         /* Viewport minus header */
-        padding-bottom: 64px;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
         /* Space for the absolute footer */
     }
 
@@ -751,7 +752,7 @@
 
 .bottom-sheet.active {
     bottom: 0;
-    padding-bottom: 74px;
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px));
     /* Slightly more space for the footer padding */
     opacity: 1;
     visibility: visible;

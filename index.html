@@ -5,6 +5,15 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    // Only disable user-scaling on mobile devices to prevent map interaction interference
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      var viewport = document.querySelector('meta[name="viewport"]');
+      if (viewport) {
+        viewport.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+      }
+    }
+  </script>
   <meta name="description" content="Mapster - Generate beautiful, minimalist map posters for any city in the world" />
   <title>Mapster - Map Poster Generator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">

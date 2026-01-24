@@ -231,6 +231,7 @@
 
     .map-panel {
         height: 100vh !important;
+        height: 100dvh !important;
     }
 
     .mobile-header .header-center {

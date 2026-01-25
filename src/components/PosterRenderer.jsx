@@ -125,6 +125,35 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
 
             <div className="poster-svg-container" style={{ aspectRatio: `${width}/${height}` }}>
                 <div className="poster-zoom-wrapper">
+                    {/* Render reflection FIRST in DOM so it naturally stays behind without z-index hacks */}
+                    {(() => {
+                        // Determine if poster theme is light or dark for contrast optimization
+                        const hex = currentTheme.bg.replace('#', '');
+                        const r = parseInt(hex.substring(0, 2), 16);
+                        const g = parseInt(hex.substring(2, 4), 16);
+                        const b = parseInt(hex.substring(4, 6), 16);
+                        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                        const isPosterLight = brightness > 128;
+
+                        return (
+                            <div
+                                className="poster-reflection"
+                                data-poster-theme={isPosterLight ? 'light' : 'dark'}
+                                style={{ backgroundColor: currentTheme.bg }}
+                            >
+                                <svg
+                                    width="100%"
+                                    height="100%"
+                                    viewBox={`0 0 ${width} ${height * 0.6}`}
+                                    preserveAspectRatio="xMidYMin slice"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <use href="#poster-info-overlay" transform={`scale(1, -1) translate(0, -${height})`} />
+                                </svg>
+                            </div>
+                        );
+                    })()}
+
                     <svg
                         key={`${aspectRatio}-${orientation}`} /* Triggers the poster-reveal animation on layout change */
                         width={width}
@@ -422,34 +451,6 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
                             </text>
                         </g>
                     </svg>
-                    {/* Updated reflection to include content mirrored from SVG */}
-                    {(() => {
-                        // Determine if poster theme is light or dark for contrast optimization
-                        const hex = currentTheme.bg.replace('#', '');
-                        const r = parseInt(hex.substring(0, 2), 16);
-                        const g = parseInt(hex.substring(2, 4), 16);
-                        const b = parseInt(hex.substring(4, 6), 16);
-                        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-                        const isPosterLight = brightness > 128;
-
-                        return (
-                            <div
-                                className="poster-reflection"
-                                data-poster-theme={isPosterLight ? 'light' : 'dark'}
-                                style={{ backgroundColor: currentTheme.bg }}
-                            >
-                                <svg
-                                    width="100%"
-                                    height="100%"
-                                    viewBox={`0 0 ${width} ${height * 0.6}`}
-                                    preserveAspectRatio="xMidYMin slice"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <use href="#poster-info-overlay" transform={`scale(1, -1) translate(0, -${height})`} />
-                                </svg>
-                            </div>
-                        );
-                    })()}
                 </div>
             </div>
         </div>

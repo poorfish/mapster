@@ -11,7 +11,8 @@
 }
 
 .poster-svg-container {
-    width: auto;
+    width: 100%;
+    /* Force width to prevent collapse in Safari Flexbox */
     height: auto;
     max-width: 100%;
     max-height: 100%;
@@ -45,11 +46,6 @@
     cursor: pointer;
     z-index: 1;
     /* Establish base stacking context */
-
-    /* Safari 3D rendering fixes */
-    transform-style: preserve-3d;
-    perspective: 1000px;
-    -webkit-font-smoothing: antialiased;
 }
 
 [data-theme='light'] .poster-zoom-wrapper {
@@ -82,7 +78,7 @@
     /* Slightly higher opacity to see text */
     filter: blur(4px);
     pointer-events: none;
-    z-index: -1;
+    z-index: 0;
     /* Apply rounded corners to all four corners */
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -92,8 +88,6 @@
     will-change: transform, opacity;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    transform-style: flat;
-    /* Keep interior flat while parent is 3D */
 
     /* Fade away naturally at distance */
     mask-image: linear-gradient(to bottom,

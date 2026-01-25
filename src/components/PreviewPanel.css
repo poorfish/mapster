@@ -525,6 +525,13 @@
     height: 100%;
     display: block;
     pointer-events: none;
+    filter: brightness(0.6) contrast(0.9);
+    transition: filter var(--transition-fast);
+}
+
+.theme-dot:hover .theme-map-svg,
+.theme-dot.active .theme-map-svg {
+    filter: brightness(0.85) contrast(1);
 }
 
 .theme-dot:hover {
@@ -888,6 +895,12 @@
     width: 100%;
     height: 100%;
     display: block;
+    filter: brightness(0.6) contrast(0.9);
+    transition: filter var(--transition-fast);
+}
+
+.mobile-theme-card.active .theme-map-svg-mobile {
+    filter: brightness(0.85) contrast(1);
 }
 
 .mobile-theme-card.active .theme-preview {

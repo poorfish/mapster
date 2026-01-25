@@ -500,15 +500,15 @@
 }
 
 .theme-dots-container {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
     gap: 8px;
-    max-width: 220px;
+    width: 100%;
 }
 
 .theme-dot {
-    width: 24px;
-    height: 16px;
+    width: 100%;
+    aspect-ratio: 3 / 2;
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: transparent;

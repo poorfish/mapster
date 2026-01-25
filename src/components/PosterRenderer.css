@@ -6,7 +6,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .poster-svg-container {
@@ -15,21 +15,47 @@
     max-width: 100%;
     max-height: 100%;
     margin: 0 auto;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 40px 120px var(--glass-shadow);
     background: transparent !important;
+    position: relative;
+    overflow: visible;
 
-    /* Professional Shutter transition */
+    /* Entry Animation */
+    animation: poster-recompose 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+    /* Professional Shutter transition for layout changes */
     transition:
         aspect-ratio 0.6s cubic-bezier(0.16, 1, 0.3, 1),
         width 0.6s cubic-bezier(0.16, 1, 0.3, 1),
         height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
+.poster-zoom-wrapper {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    will-change: aspect-ratio;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 40px 120px var(--glass-shadow);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+        box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    cursor: pointer;
+}
+
+[data-theme='light'] .poster-zoom-wrapper {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
+}
+
+.poster-zoom-wrapper:hover {
+    transform: scale(1.03);
+    /* Slightly more prominent */
+    box-shadow: 0 60px 150px var(--glass-shadow);
+    z-index: 100;
+}
+
+[data-theme='light'] .poster-zoom-wrapper:hover {
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.08);
 }
 
 /* Elegant Recomposition Entrance */
@@ -40,38 +66,22 @@
     height: auto;
     display: block;
     object-fit: contain;
-    animation: poster-recompose 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    /* Removed animation and transition from SVG to use wrapper instead */
 }
 
 @keyframes poster-recompose {
     0% {
         opacity: 0;
-        transform: scale(0.99) translateY(6px);
+        transform: translateY(15px);
     }
 
     100% {
         opacity: 1;
-        transform: scale(1) translateY(0);
+        transform: translateY(0);
     }
 }
 
 
-.poster-svg-container:hover {
-    transform: scale(1.02);
-}
-
-[data-theme='light'] .poster-svg-container {
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
-}
-
-.poster-svg {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    display: block;
-    object-fit: contain;
-}
 
 .loading-overlay {
     position: absolute;

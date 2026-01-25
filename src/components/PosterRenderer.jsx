@@ -210,13 +210,13 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
                                 />
                             ))}
 
-                            {/* Show placeholder if no data yet - gold colors matching midnight_blue theme */}
+                            {/* Show placeholder if no data yet - dynamic theme colors */}
                             {!osmData && !loading && (
                                 <>
-                                    <circle cx={centerX} cy={centerY} r="150" fill="none" stroke="#D4AF37" strokeWidth="2" opacity="0.3" />
-                                    <circle cx={centerX} cy={centerY} r="100" fill="none" stroke="#C9A961" strokeWidth="1.5" opacity="0.3" />
-                                    <circle cx={centerX} cy={centerY} r="50" fill="none" stroke="#BEA38B" strokeWidth="1" opacity="0.3" />
-                                    <text x={centerX} y={centerY} textAnchor="middle" fill="#D4AF37" opacity="0.35" fontSize="14">
+                                    <circle cx={centerX} cy={centerY} r="150" fill="none" stroke={currentTheme.road_motorway} strokeWidth="2" opacity="0.3" />
+                                    <circle cx={centerX} cy={centerY} r="100" fill="none" stroke={currentTheme.road_primary} strokeWidth="1.5" opacity="0.3" />
+                                    <circle cx={centerX} cy={centerY} r="50" fill="none" stroke={currentTheme.road_secondary} strokeWidth="1" opacity="0.3" />
+                                    <text x={centerX} y={centerY} textAnchor="middle" fill={currentTheme.road_primary} opacity="0.35" fontSize="14">
                                         Map data will render here
                                     </text>
                                 </>

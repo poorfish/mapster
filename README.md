@@ -1,21 +1,18 @@
-![Banner](public/banner.jpg)
-
-English | [简体中文](README_CN.md)
-
 # Mapster
 
-A React web application for creating beautiful, minimalist map posters for any location in the world. Search for a city, customize the theme and layout, then download your poster as SVG or PNG.
+A premium React web application designed to create beautiful, minimalist map posters for any location on Earth. Mapster combines powerful map data visualization with a sophisticated, glassmorphism-inspired UI to deliver a studio-quality design experience.
 
 **Live Demo:** [mymapster.vercel.app](https://mymapster.vercel.app/)
 
-## Features
+## Key Features
 
-- **Interactive Map** - Pan and zoom to select any location worldwide
-- **Location Search** - Find cities using OpenStreetMap Nominatim
-- **20 Themes** - From classic Noir to Neon Cyberpunk, Midnight Gold to Nordic Light
-- **Custom Typography** - Choose from 5 font families
-- **Flexible Layouts** - Portrait/landscape orientation, multiple aspect ratios (2:3, 3:4, 4:5, 1:1)
-- **Export Options** - Download as high-resolution PNG or scalable SVG
+- **Interactive Global Mapping** - Precise location selection with integrated panning, zooming, and city search.
+- **High-Fidelity Exports** - Download your creations as production-ready high-resolution PNGs or scalable SVGs.
+- **Flexible Personalization** - Choose from 20+ professionally curated themes, 5+ premium font families, and multiple aspect ratios (Portrait, Landscape).
+- **Mobile-First Optimization** - Deeply refined for mobile browsers, featuring adaptive "Bottom Sheet" menus and robust viewport handling.
+- **Aesthetic 3D Reflections** - Experience your poster on a virtual gallery floor with realistic trapezoidal reflections and synced metadata.
+- **Glassmorphism Design System** - A sleek, modern interface featuring adaptive blur effects and smooth micro-animations.
+- **Progressive Composition** - Informative loading states that guide you through the asynchronous poster generation process.
 
 ## Screenshots
 
@@ -26,74 +23,44 @@ A React web application for creating beautiful, minimalist map posters for any l
 ### Deploy with Vercel
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fpoorfish%2Fmapster)
 
-### Deploy locally
+### Local Setup
 ```bash
-# Install dependencies
+# Clone and install dependencies
+git clone https://github.com/poorfish/mapster.git
+cd mapster
 npm install
 
-# Start development server
+# Launch the development studio
 npm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-## Usage
+## Customization Options
 
-1. **Search** for a city or pan the map to your desired location
-2. **Click "Generate"** to create the map poster
-3. **Customize** theme, font, and layout in the settings panel
-4. **Download** as PNG or SVG
-
-## Available Themes
-
-| Theme | Style |
-|-------|-------|
-| Feature-Based | Classic black & white hierarchy |
-| Noir | Pure black background, white roads |
-| Midnight Blue | Navy with gold accents |
-| Midnight Gold | Black with brushed gold |
-| Neon Cyberpunk | Electric pink and cyan |
-| Blueprint | Architectural aesthetic |
-| Warm Beige | Vintage sepia tones |
-| Pastel Dream | Soft muted pastels |
-| Japanese Ink | Minimalist ink wash |
-| Forest | Deep greens and sage |
-| Ocean | Blues and teals |
-| Terracotta | Mediterranean warmth |
-| Sunset | Warm oranges and pinks |
-| Autumn | Burnt oranges and reds |
-| Copper Patina | Oxidized copper aesthetic |
-| Monochrome Blue | Single blue color family |
-| Gradient Roads | Smooth gradient shading |
-| Contrast Zones | High contrast urban density |
-| Emerald City | Dark green with silver highlights |
-| Nordic Light | Scandinavian minimalism |
+| Category | Available Selections |
+|----------|-------|
+| **Themes** | Noir, Midnight Gold, Cyberpunk, Forest, Ocean, Blueprint, and more (20+ total) |
+| **Typography** | Inter, Playfair Display, Montserrat, Courier Prime, Outfit, Nunito |
+| **Layouts** | Portrait, Landscape |
+| **Ratios** | 2:3, 3:4, 4:5, 1:1, 16:9 |
 
 ## Tech Stack
 
-- **React 18** with Vite
-- **Leaflet** for interactive maps
-- **OpenStreetMap** Overpass API for map data
-- **Pure SVG** rendering for crisp exports
-
-## Development
-
-```bash
-npm run dev      # Start dev server
-npm run build    # Build for production
-npm run preview  # Preview production build
-```
+- **React 18** (Powered by **Vite** for lightning-fast HMR)
+- **Leaflet** for high-performance map interaction
+- **OSM Overpass API** for real-time geographic data fetching
+- **SVG Engine** for resolution-independent rendering
 
 ## Acknowledgments
 
-This project is built upon the excellent work of [originalankur/maptoposter](https://github.com/originalankur/maptoposter). We've extended the original concept with:
+Mapster is inspired by and built upon the core concepts of [originalankur/maptoposter](https://github.com/originalankur/maptoposter). We have significantly elevated the experience with:
 
-- **Rebranded UI** - Renamed to Mapster with custom branding and icon
-- **Enhanced UX** - Improved menu interactions and button states
-- **Dark Theme Integration** - Consistent dark color scheme across all UI elements
-- **Better Layout** - Optimized split-pane design for desktop use
+- **Premium Visual Language** - A complete redesign focused on depth, light, and modern aesthetics.
+- **Robust Cross-Platform Support** - Native-feeling interactions on mobile Safari with fixed viewport logic.
+- **Asynchronous Architecture** - Improved data fetching and error handling for a reliable user experience.
 
-We're grateful to the original creators for open-sourcing this fantastic tool and making it possible for others to build upon their work.
+We are grateful to the open-source community and the original creators for providing the foundation for this creative tool.
 
 ## License
 

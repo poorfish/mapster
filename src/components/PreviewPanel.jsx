@@ -108,7 +108,7 @@ function PreviewPanel({
 
         try {
             const posterElement = document.querySelector('.poster-svg-container')
-            const svgElement = posterElement?.querySelector('svg')
+            const svgElement = posterElement?.querySelector('.poster-svg')
 
             if (!svgElement) {
                 throw new Error('Poster not found. Please wait for the map to load.')
@@ -117,9 +117,9 @@ function PreviewPanel({
             const filename = generateFilename(city, theme)
 
             if (format === 'svg') {
-                exportSVG(svgElement, filename)
+                exportSVG(svgElement, filename, fontFamily)
             } else if (format === 'png') {
-                await exportPNG(svgElement, filename, 3)
+                await exportPNG(svgElement, filename, fontFamily, 3)
             }
         } catch (error) {
             console.error('Download failed:', error)

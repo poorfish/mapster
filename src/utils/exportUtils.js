@@ -5,7 +5,7 @@
 /**
  * Serialize SVG to string safely, including external fonts
  */
-function getSerializedSVG(svgElement) {
+function getSerializedSVG(svgElement, fontFamily = 'Inter') {
     // Clone the SVG to avoid modifying the original
     const clonedSvg = svgElement.cloneNode(true);
 
@@ -16,11 +16,11 @@ function getSerializedSVG(svgElement) {
     clonedSvg.setAttribute('width', width);
     clonedSvg.setAttribute('height', height);
 
-    // Embed font styles so they appear in PNG export
+    // Embed all fonts used in the app so they appear in PNG export
     const style = document.createElement('style');
+    // Using a more comprehensive font import that matches the app's available fonts
     style.textContent = `
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;700&display=swap');
-        text { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;500;600;700&family=Courier+Prime:wght@400;700&family=Outfit:wght@300;400;500;600;700&family=Nunito:wght@200..900&display=swap');
     `;
     clonedSvg.prepend(style);
 
@@ -36,14 +36,14 @@ function getSerializedSVG(svgElement) {
 /**
  * Export SVG element as a downloadable file
  */
-export function exportSVG(svgElement, filename) {
+export function exportSVG(svgElement, filename, fontFamily) {
     if (!svgElement) {
         console.error('No SVG element provided for export');
         return;
     }
 
     try {
-        const svgString = getSerializedSVG(svgElement);
+        const svgString = getSerializedSVG(svgElement, fontFamily);
         const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
 
         const url = URL.createObjectURL(blob);
@@ -69,7 +69,7 @@ export function exportSVG(svgElement, filename) {
  * Avoids html2canvas overhead which often leads to "Invalid string length" errors
  * when dealing with complex SVGs.
  */
-export async function exportPNG(svgElement, filename, scale = 3) {
+export async function exportPNG(svgElement, filename, fontFamily, scale = 3) {
     if (!svgElement) {
         console.error('No SVG element provided for export');
         return;
@@ -77,7 +77,7 @@ export async function exportPNG(svgElement, filename, scale = 3) {
 
     return new Promise((resolve, reject) => {
         try {
-            const svgString = getSerializedSVG(svgElement);
+            const svgString = getSerializedSVG(svgElement, fontFamily);
             const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
 
             const viewBox = svgElement.getAttribute('viewBox')?.split(' ') || [0, 0, 600, 800];

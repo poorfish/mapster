@@ -1,6 +1,10 @@
 /**
- * Export utilities for downloading posters as SVG or PNG
+ * Helper to clean font name by removing extra quotes
  */
+function cleanFontName(font) {
+    if (!font) return 'Inter';
+    return font.replace(/['"]/g, '').trim();
+}
 
 /**
  * Serialize SVG to string safely, including external fonts
@@ -27,12 +31,15 @@ function getSerializedSVG(svgElement, fontFamily = 'Inter') {
     const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
     style.setAttribute('type', 'text/css');
 
+    // Cleanup font name to ensure it works correctly in CSS
+    const fontName = cleanFontName(fontFamily);
+
     // We force the chosen fontFamily on all text elements to ensure cross-viewer compatibility
     style.textContent = `
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;500;600;700&family=Courier+Prime:wght@400;700&family=Outfit:wght@300;400;500;600;700&family=Nunito:wght@200..900&display=swap');
         
         text, tspan {
-            font-family: ${fontFamily}, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            font-family: "${fontName}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         }
     `;
     defs.appendChild(style);
@@ -69,7 +76,7 @@ export function exportSVG(svgElement, filename, fontFamily) {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
 
-        console.log(`SVG exported successfully: ${filename}.svg`);
+        console.log(`SVG exported successfully: ${filename}.svg using font: ${fontFamily}`);
     } catch (error) {
         console.error('Failed to export SVG:', error);
         throw error;
@@ -78,9 +85,6 @@ export function exportSVG(svgElement, filename, fontFamily) {
 
 /**
  * Export SVG element as a high-resolution PNG using native Canvas
- * 
- * Avoids html2canvas overhead which often leads to "Invalid string length" errors
- * when dealing with complex SVGs.
  */
 export async function exportPNG(svgElement, filename, fontFamily, scale = 3) {
     if (!svgElement) {
@@ -102,7 +106,6 @@ export async function exportPNG(svgElement, filename, fontFamily, scale = 3) {
             canvas.height = height * scale;
             const ctx = canvas.getContext('2d');
 
-            // Enable high quality image scaling
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
 
@@ -111,7 +114,6 @@ export async function exportPNG(svgElement, filename, fontFamily, scale = 3) {
 
             img.onload = () => {
                 try {
-                    // Draw to canvas with scaling
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                     canvas.toBlob((pngBlob) => {
@@ -129,9 +131,9 @@ export async function exportPNG(svgElement, filename, fontFamily, scale = 3) {
                         link.click();
                         document.body.removeChild(link);
 
-                        // Cleanup
                         URL.revokeObjectURL(pngUrl);
                         URL.revokeObjectURL(url);
+                        console.log(`PNG exported successfully: ${filename}.png using font: ${fontFamily}`);
                         resolve();
                     }, 'image/png');
                 } catch (err) {
@@ -141,7 +143,7 @@ export async function exportPNG(svgElement, filename, fontFamily, scale = 3) {
 
             img.onerror = (err) => {
                 URL.revokeObjectURL(url);
-                reject(new Error('Failed to load SVG into image for PNG conversion'));
+                reject(new Error('Failed to load SVG into image for PNG conversion. Ensure fonts are loaded.'));
             };
 
             img.src = url;
@@ -153,10 +155,17 @@ export async function exportPNG(svgElement, filename, fontFamily, scale = 3) {
 }
 
 /**
- * Generate filename from city and theme
+ * Generate filename from city, theme, and font
  */
-export function generateFilename(city, theme) {
+export function generateFilename(city, theme, fontFamily = '') {
     const citySlug = city.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
     const themeSlug = theme.toLowerCase().replace(/\s+/g, '_');
-    return `${citySlug}_${themeSlug}_poster`;
+    const fontSlug = cleanFontName(fontFamily).toLowerCase().replace(/\s+/g, '_');
+    const timestamp = new Date().getTime().toString().slice(-4); // Add small timestamp to break cache
+
+    let name = `${citySlug}_${themeSlug}`;
+    if (fontSlug) name += `_${fontSlug}`;
+    name += `_${timestamp}`;
+
+    return name;
 }

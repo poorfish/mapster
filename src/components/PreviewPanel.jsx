@@ -114,7 +114,7 @@ function PreviewPanel({
                 throw new Error('Poster not found. Please wait for the map to load.')
             }
 
-            const filename = generateFilename(city, theme)
+            const filename = generateFilename(city, theme, fontFamily)
 
             if (format === 'svg') {
                 exportSVG(svgElement, filename, fontFamily)

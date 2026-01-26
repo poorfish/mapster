@@ -92,6 +92,16 @@ export async function exportPNG(svgElement, filename, fontFamily, scale = 3) {
         return;
     }
 
+    // Ensure fonts are actually loaded in the document before we try to render to canvas
+    // This helps the browser "share" the cached font with the Image element
+    try {
+        if (document.fonts && document.fonts.ready) {
+            await document.fonts.ready;
+        }
+    } catch (e) {
+        console.warn('Font loading check failed, attempting export anyway...', e);
+    }
+
     return new Promise((resolve, reject) => {
         try {
             const svgString = getSerializedSVG(svgElement, fontFamily);
@@ -113,32 +123,36 @@ export async function exportPNG(svgElement, filename, fontFamily, scale = 3) {
             const url = URL.createObjectURL(blob);
 
             img.onload = () => {
-                try {
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                // IMPORTANT: We need a small delay. Even after onload, fonts inside 
+                // SVG-as-Image might take a few milliseconds to layout correctly.
+                setTimeout(() => {
+                    try {
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-                    canvas.toBlob((pngBlob) => {
-                        if (!pngBlob) {
-                            reject(new Error('Failed to generate PNG blob'));
-                            return;
-                        }
+                        canvas.toBlob((pngBlob) => {
+                            if (!pngBlob) {
+                                reject(new Error('Failed to generate PNG blob'));
+                                return;
+                            }
 
-                        const pngUrl = URL.createObjectURL(pngBlob);
-                        const link = document.createElement('a');
-                        link.href = pngUrl;
-                        link.download = `${filename}.png`;
+                            const pngUrl = URL.createObjectURL(pngBlob);
+                            const link = document.createElement('a');
+                            link.href = pngUrl;
+                            link.download = `${filename}.png`;
 
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
 
-                        URL.revokeObjectURL(pngUrl);
-                        URL.revokeObjectURL(url);
-                        console.log(`PNG exported successfully: ${filename}.png using font: ${fontFamily}`);
-                        resolve();
-                    }, 'image/png');
-                } catch (err) {
-                    reject(err);
-                }
+                            URL.revokeObjectURL(pngUrl);
+                            URL.revokeObjectURL(url);
+                            console.log(`PNG exported successfully: ${filename}.png using font: ${fontFamily}`);
+                            resolve();
+                        }, 'image/png');
+                    } catch (err) {
+                        reject(err);
+                    }
+                }, 150); // 150ms buffer for font rendering inside the image
             };
 
             img.onerror = (err) => {

@@ -768,7 +768,7 @@
     }
 
     .mobile-only-inline {
-        display: inline-block !important;
+        display: flex !important;
     }
 
     .preview-panel {
@@ -793,6 +793,7 @@
     .header-left,
     .header-right {
         z-index: 5;
+        gap: var(--spacing-md) !important;
     }
 
     .preview-title {

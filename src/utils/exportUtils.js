@@ -83,8 +83,25 @@ export function exportSVG(svgElement, filename, fontFamily) {
     }
 }
 
+// Import WASM and components for PNG generation
+import { initWasm, Resvg } from '@resvg/resvg-wasm';
+import wasmUrl from '@resvg/resvg-wasm/index_bg.wasm?url';
+import { fontManager } from './FontManager';
+
+let wasmInitialized = false;
+
 /**
- * Export SVG element as a high-resolution PNG using native Canvas
+ * Initialize WebAssembly module for Resvg
+ */
+async function initResvg() {
+    if (wasmInitialized) return;
+    await initWasm(wasmUrl);
+    wasmInitialized = true;
+}
+
+/**
+ * Export SVG element as a high-resolution PNG using Resvg (WASM)
+ * This guarantees accurate font rendering by bypassing the browser's limited Canvas API.
  */
 export async function exportPNG(svgElement, filename, fontFamily, scale = 3) {
     if (!svgElement) {
@@ -92,80 +109,74 @@ export async function exportPNG(svgElement, filename, fontFamily, scale = 3) {
         return;
     }
 
-    // Ensure fonts are actually loaded in the document before we try to render to canvas
-    // This helps the browser "share" the cached font with the Image element
     try {
-        if (document.fonts && document.fonts.ready) {
-            await document.fonts.ready;
+        console.log('Starting high-fidelity PNG export with Resvg...');
+
+        // 1. Initialize WASM
+        await initResvg();
+
+        // 2. Prepare SVG string
+        const svgString = getSerializedSVG(svgElement, fontFamily);
+
+        // 3. Load the specific font data
+        // We load multiple weights (400, 700) to ensure the poster renders correctly
+        const fontBuffers = await fontManager.loadFontFamily(fontFamily);
+
+        // Also load Inter as a safe fallback
+        const interBuffers = await fontManager.loadFontFamily('Inter');
+
+        // 4. Configure Resvg
+        // We pass the font buffers to Resvg so it can render text natively
+        const opts = {
+            fitTo: {
+                mode: 'zoom',
+                value: scale
+            },
+            font: {
+                fontBuffers: [],
+                loadSystemFonts: false, // Browser WASM cannot access system fonts
+                defaultFontFamily: 'Inter' // Fallback
+            }
+        };
+
+        // Add main font buffers
+        if (fontBuffers && fontBuffers.length > 0) {
+            fontBuffers.forEach(buf => opts.font.fontBuffers.push(buf));
         }
-    } catch (e) {
-        console.warn('Font loading check failed, attempting export anyway...', e);
+
+        // Add fallback Inter buffers (if distinct)
+        if (cleanFontName(fontFamily) !== 'Inter' && interBuffers && interBuffers.length > 0) {
+            interBuffers.forEach(buf => opts.font.fontBuffers.push(buf));
+        }
+
+        // 5. Render
+        const resvg = new Resvg(svgString, opts);
+        const pngData = resvg.render();
+        const pngBuffer = pngData.asPng();
+
+        // 6. Create Blob and Download
+        const blob = new Blob([pngBuffer], { type: 'image/png' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${filename}.png`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+
+        // Cleanup WASM memory for image
+        resvg.free();
+
+        console.log(`PNG exported successfully (High-Fidelity): ${filename}.png`);
+
+    } catch (error) {
+        console.error('Failed to export PNG with Resvg:', error);
+        throw error;
     }
-
-    return new Promise((resolve, reject) => {
-        try {
-            const svgString = getSerializedSVG(svgElement, fontFamily);
-            const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-
-            const viewBox = svgElement.getAttribute('viewBox')?.split(' ') || [0, 0, 600, 800];
-            const width = parseFloat(viewBox[2]);
-            const height = parseFloat(viewBox[3]);
-
-            const canvas = document.createElement('canvas');
-            canvas.width = width * scale;
-            canvas.height = height * scale;
-            const ctx = canvas.getContext('2d');
-
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-
-            const img = new Image();
-            const url = URL.createObjectURL(blob);
-
-            img.onload = () => {
-                // IMPORTANT: We need a small delay. Even after onload, fonts inside 
-                // SVG-as-Image might take a few milliseconds to layout correctly.
-                setTimeout(() => {
-                    try {
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                        canvas.toBlob((pngBlob) => {
-                            if (!pngBlob) {
-                                reject(new Error('Failed to generate PNG blob'));
-                                return;
-                            }
-
-                            const pngUrl = URL.createObjectURL(pngBlob);
-                            const link = document.createElement('a');
-                            link.href = pngUrl;
-                            link.download = `${filename}.png`;
-
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-
-                            URL.revokeObjectURL(pngUrl);
-                            URL.revokeObjectURL(url);
-                            console.log(`PNG exported successfully: ${filename}.png using font: ${fontFamily}`);
-                            resolve();
-                        }, 'image/png');
-                    } catch (err) {
-                        reject(err);
-                    }
-                }, 150); // 150ms buffer for font rendering inside the image
-            };
-
-            img.onerror = (err) => {
-                URL.revokeObjectURL(url);
-                reject(new Error('Failed to load SVG into image for PNG conversion. Ensure fonts are loaded.'));
-            };
-
-            img.src = url;
-        } catch (error) {
-            console.error('Failed to export PNG:', error);
-            reject(error);
-        }
-    });
 }
 
 /**

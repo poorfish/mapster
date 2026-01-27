@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@resvg/resvg-wasm": "^2.6.2",
     "axios": "^1.7.2",
     "html2canvas": "^1.4.1",
     "leaflet": "^1.9.4",

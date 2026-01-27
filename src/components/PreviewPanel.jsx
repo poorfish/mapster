@@ -16,48 +16,140 @@ const getSeededRandom = (seed) => {
     };
 };
 
-// Miniature map preview component with unique geometry per theme
 const ThemeMapPreview = ({ themeName, className, style }) => {
     const t = getTheme(themeName);
     const rnd = getSeededRandom(themeName);
 
-    // Water: Organic curve
-    const rY = 40 + (rnd(1) * 20 - 10);
-    const waterD = `M0,${rY} Q30,${rY - 25 * rnd(2)} 70,${rY + 15 * rnd(3)} T120,${rY - 10 * rnd(4)} L120,80 L0,80 Z`;
+    return useMemo(() => {
+        const waterPaths = [];
+        const parkPaths = [];
 
-    // Parks: Blobs
-    const p1D = `M${20 + rnd(5) * 30},${15 + rnd(6) * 15} Q${40 + rnd(7) * 20},${5 + rnd(8) * 5} ${60 + rnd(9) * 20},${25 + rnd(10) * 10} Q${50 + rnd(11) * 10},${45 + rnd(12) * 5} ${20 + rnd(13) * 10},${35 + rnd(14) * 10} Z`;
-    const p2D = `M${80 + rnd(15) * 20},${45 + rnd(16) * 15} Q${110 + rnd(17) * 10},${35 + rnd(18) * 10} ${110 + rnd(19) * 5},${65 + rnd(20) * 10} Q${90 + rnd(21) * 10},${75 + rnd(22) * 5} ${80 + rnd(23) * 10},${55 + rnd(24) * 10} Z`;
+        // 1. Water & Parks - Procedural blobs
+        if (rnd(1) > 0.4) {
+            const side = rnd(2) > 0.5 ? 'right' : 'left';
+            const d = side === 'right'
+                ? `M 95,0 Q ${105 + rnd(3) * 15},${40 + rnd(4) * 10} 90,80 L 120,80 L 120,0 Z`
+                : `M 0,40 Q ${20 + rnd(5) * 20},${60 + rnd(6) * 10} 0,80 Z`;
+            waterPaths.push(<path key="water" d={d} fill={t.water} />);
+        }
 
-    // Roads: All Quadratic Bézier Curves for natural flow
-    const mY1 = 20 + rnd(25) * 40;
-    const mY2 = 20 + rnd(26) * 40;
-    const motorwayD = `M-10,${mY1} Q60,${(mY1 + mY2) / 2 + (rnd(27) * 40 - 20)} 130,${mY2}`;
+        for (let i = 0; i < 2; i++) {
+            const px = 15 + rnd(7 + i) * 70;
+            const py = 15 + rnd(8 + i) * 40;
+            const r = 10 + rnd(9 + i) * 10;
+            const d = `M ${px},${py} Q ${px + r},${py - r / 2} ${px + r * 1.5},${py + r / 3} Q ${px + r},${py + r} ${px},${py + r * 0.9} Z`;
+            parkPaths.push(<path key={`park-${i}`} d={d} fill={t.parks} />);
+        }
 
-    const pX1 = 30 + rnd(28) * 60;
-    const pX2 = 30 + rnd(29) * 60;
-    const primaryD = `M${pX1},-10 Q${(pX1 + pX2) / 2 + (rnd(30) * 30 - 15)},40 ${pX2},90`;
+        // 2. Road Network
+        const minorRoads = [];
+        const secondaryRoads = [];
+        const majorRoads = [];
 
-    // Secondary "vines" - random curved segments
-    const s1D = `M${rnd(31) * 100},${rnd(32) * 80} Q${rnd(33) * 120},${rnd(34) * 80} ${rnd(35) * 120},${rnd(36) * 80}`;
-    const s2D = `M${rnd(37) * 120},${rnd(38) * 80} Q${rnd(39) * 120},${rnd(40) * 80} ${rnd(41) * 100},${rnd(42) * 100}`;
+        // Sparse Grid (Residential)
+        const hStart = rnd(20) * 40;
+        const hCount = 3 + Math.floor(rnd(21) * 5);
+        for (let i = 0; i < hCount; i++) {
+            const y = hStart + i * (8 + rnd(22 + i) * 6);
+            if (y > 5 && y < 75) {
+                minorRoads.push(<line key={`h-${i}`} x1="-10" y1={y} x2="130" y2={y + (rnd(23 + i) * 6 - 3)} />);
+            }
+        }
 
-    return (
-        <svg
-            className={className}
-            style={{ ...style, background: t.bg }}
-            viewBox="0 0 120 80"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <path d={waterD} fill={t.water} opacity="0.8" />
-            <path d={p1D} fill={t.parks} opacity="0.7" />
-            <path d={p2D} fill={t.parks} opacity="0.7" />
-            <path d={s1D} fill="none" stroke={t.road_secondary} strokeWidth="1.2" opacity="0.5" strokeLinecap="round" />
-            <path d={s2D} fill="none" stroke={t.road_secondary} strokeWidth="1.2" opacity="0.5" strokeLinecap="round" />
-            <path d={primaryD} fill="none" stroke={t.road_primary} strokeWidth="2.8" strokeLinecap="round" />
-            <path d={motorwayD} fill="none" stroke={t.road_motorway} strokeWidth="4.5" strokeLinecap="round" />
-        </svg>
-    );
+        const vStart = rnd(24) * 60;
+        const vCount = 4 + Math.floor(rnd(25) * 6);
+        for (let i = 0; i < vCount; i++) {
+            const x = vStart + i * (10 + rnd(26 + i) * 8);
+            if (x > 5 && x < 115) {
+                minorRoads.push(<line key={`v-${i}`} x1={x} y1="-10" x2={x + (rnd(27 + i) * 6 - 3)} y2="90" />);
+            }
+        }
+
+        // Secondary Roads
+        const secCount = 2 + Math.floor(rnd(28) * 2);
+        for (let i = 0; i < secCount; i++) {
+            const startSide = rnd(29 + i) > 0.5 ? 'left' : 'top';
+            let d = '';
+            if (startSide === 'left') {
+                const y1 = 10 + rnd(30 + i) * 60;
+                const y2 = 10 + rnd(31 + i) * 60;
+                d = `M -10,${y1} Q 60,${(y1 + y2) / 2 + (rnd(32 + i) * 40 - 20)} 130,${y2}`;
+            } else {
+                const x1 = 10 + rnd(33 + i) * 100;
+                const x2 = 10 + rnd(34 + i) * 100;
+                d = `M ${x1},-10 Q ${(x1 + x2) / 2 + (rnd(35 + i) * 40 - 20)},40 ${x2},90`;
+            }
+            secondaryRoads.push(<path key={`s-${i}`} d={d} />);
+        }
+
+        // Major Arteries & Roundabout
+        const fX = 35 + rnd(36) * 50;
+        const fY = 30 + rnd(37) * 25;
+        const rRadius = 5 + rnd(38) * 6; // Range 5 to 11
+
+        // Exact 2 bent arms logic
+        // Max 5 arms (3 to 5)
+        const numArms = 3 + Math.floor(rnd(39) * 3);
+
+        // Pick 2 distinct indices to be curves
+        const bentIndices = [];
+        const possibleIndices = Array.from({ length: numArms }, (_, i) => i);
+        // Shuffle to pick 2
+        for (let i = 0; i < possibleIndices.length; i++) {
+            const swapIdx = Math.floor(rnd(40 + i) * possibleIndices.length);
+            [possibleIndices[i], possibleIndices[swapIdx]] = [possibleIndices[swapIdx], possibleIndices[i]];
+        }
+        bentIndices.push(possibleIndices[0], possibleIndices[1]);
+
+        let currentAngle = rnd(41) * Math.PI;
+        for (let i = 0; i < numArms; i++) {
+            currentAngle += (Math.PI * 2 / numArms) + (rnd(42 + i) * 0.5 - 0.25);
+            const armWidth = 1.2 + rnd(43 + i) * 1.0; // Thinner: 1.2 to 2.2
+            const isBent = bentIndices.includes(i);
+
+            const len = 140;
+            const tx = fX + Math.cos(currentAngle) * len;
+            const ty = fY + Math.sin(currentAngle) * len;
+
+            if (isBent) {
+                const bendAmount = (rnd(44 + i) > 0.5 ? 1 : -1);
+                // Control Point for Quadratic Curve
+                const cpAngle = currentAngle + bendAmount * 0.5;
+                const cpLen = len * 0.5;
+                const cpX = fX + Math.cos(cpAngle) * cpLen;
+                const cpY = fY + Math.sin(cpAngle) * cpLen;
+
+                majorRoads.push(
+                    <path
+                        key={`m-${i}`}
+                        d={`M ${fX},${fY} Q ${cpX},${cpY} ${tx},${ty}`}
+                        strokeWidth={armWidth}
+                    />
+                );
+            } else {
+                majorRoads.push(
+                    <line
+                        key={`m-${i}`}
+                        x1={fX} y1={fY} x2={tx} y2={ty}
+                        strokeWidth={armWidth}
+                    />
+                );
+            }
+        }
+
+        const roundabout = <circle cx={fX} cy={fY} r={rRadius} fill={t.bg} stroke={t.road_motorway} strokeWidth={Math.max(2, rRadius * 0.3)} />;
+
+        return (
+            <svg className={className} style={{ ...style, background: t.bg }} viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+                {waterPaths}
+                {parkPaths}
+                <g stroke={t.road_residential} strokeWidth="0.5" opacity="0.6">{minorRoads}</g>
+                <g stroke={t.road_secondary} strokeWidth="1.4" strokeLinecap="round" fill="none">{secondaryRoads}</g>
+                <g stroke={t.road_motorway} strokeLinecap="round" fill="none">{majorRoads}</g>
+                {roundabout}
+            </svg>
+        );
+    }, [themeName, t]);
 };
 
 function PreviewPanel({

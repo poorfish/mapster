@@ -1018,7 +1018,7 @@
 .theme-preview {
     width: 100%;
     aspect-ratio: 3 / 2;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     position: relative;
     border: 1px solid var(--border-color);
     background: var(--bg-control);
@@ -1064,8 +1064,8 @@
     position: absolute;
     inset: 0.5px;
     border: 1px solid #ffffff;
-    border-radius: 7px;
-    /* 适配移动端圆角 */
+    border-radius: calc(var(--radius-md) - 1.5px);
+    /* 适配移动端圆角: parent radius (8px) - border-width/gap adjustment */
     pointer-events: none;
     z-index: 5;
 }

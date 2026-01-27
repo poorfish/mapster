@@ -30,7 +30,8 @@ function LocationSearch({ onLocationSelect }) {
                         q: query,
                         format: 'json',
                         limit: 5,
-                        addressdetails: 1
+                        addressdetails: 1,
+                        'accept-language': 'en'
                     }
                 })
                 setResults(response.data)

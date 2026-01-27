@@ -39,6 +39,7 @@ function buildCombinedQuery(lat, lon, radius) {
         [out:json][timeout:60];
         (
             way["highway"~"motorway|trunk|primary|secondary|tertiary|residential|service|unclassified|footway|cycleway|path|track|steps"](around:${radius},${lat},${lon});
+            way["railway"~"rail|subway|light_rail|tram|monorail"](around:${radius},${lat},${lon});
             way["natural"="water"](around:${radius},${lat},${lon});
             way["waterway"~"river|stream|canal"](around:${radius},${lat},${lon});
             relation["natural"="water"](around:${radius},${lat},${lon});
@@ -60,6 +61,7 @@ function buildMajorFeaturesQuery(lat, lon, radius) {
         [out:json][timeout:15][maxsize:268435456];
         (
             way["highway"~"${coreRoads}"](around:${radius},${lat},${lon});
+            way["railway"~"rail|subway|light_rail|tram|monorail"](around:${radius},${lat},${lon});
             way["natural"="water"](around:${radius},${lat},${lon});
             way["waterway"~"river|stream|canal"](around:${radius},${lat},${lon});
             way["leisure"~"park|pitch|playground|garden|swimming_pool|track"](around:${radius},${lat},${lon});
@@ -179,7 +181,8 @@ function getSimplifyTolerance(radius) {
  * Filter elements by type from the combined result
  */
 function processElements(elements, radius = 2000) {
-    let roads = [];
+    const roads = [];
+    const rails = [];
     const water = [];
     const parks = [];
     const buildings = [];
@@ -213,6 +216,10 @@ function processElements(elements, radius = 2000) {
             // Simplify geometry to reduce SVG complexity
             el.geometry = simplifyGeometry(el.geometry, SIMPLIFY_TOLERANCE);
             roads.push(el);
+        } else if (tags.railway) {
+            // Processing for rails
+            el.geometry = simplifyGeometry(el.geometry, SIMPLIFY_TOLERANCE);
+            rails.push(el);
         } else if (tags.natural === 'water' || tags.waterway || tags.water || el.type === 'relation') {
             el.geometry = simplifyGeometry(el.geometry, SIMPLIFY_TOLERANCE);
             water.push(el);
@@ -229,7 +236,7 @@ function processElements(elements, radius = 2000) {
         }
     });
 
-    return { roads, water, parks, buildings };
+    return { roads, rails, water, parks, buildings };
 }
 
 /**
@@ -367,7 +374,7 @@ export async function fetchOSMData(lat, lon, distance) {
         const query = buildCombinedQuery(lat, lon, fetchRadius);
         const elements = await fetchFromOverpass(query);
 
-        const { roads, water, parks, buildings } = processElements(elements, fetchRadius);
+        const { roads, rails, water, parks, buildings } = processElements(elements, fetchRadius);
 
         // Use fixed bounds based on the request to ensure perfect centering
         const bounds = getRequestBounds(lat, lon, distance);
@@ -376,6 +383,7 @@ export async function fetchOSMData(lat, lon, distance) {
 
         const result = {
             roads,
+            rails,
             water,
             parks,
             buildings,
@@ -461,10 +469,11 @@ export async function fetchOSMDataProgressive(lat, lon, distance, onProgress) {
         console.log('[MapDataFetcher] Stage 1: Fetching major features...');
         const majorQuery = buildMajorFeaturesQuery(lat, lon, fetchRadius);
         const majorElements = await fetchFromOverpass(majorQuery);
-        const { roads: majorRoads, water, parks, buildings: majorBuildings } = processElements(majorElements, fetchRadius);
+        const { roads: majorRoads, rails, water, parks, buildings: majorBuildings } = processElements(majorElements, fetchRadius);
 
         const majorData = {
             roads: majorRoads,
+            rails,
             water,
             parks,
             buildings: majorBuildings,
@@ -503,6 +512,7 @@ export async function fetchOSMDataProgressive(lat, lon, distance, onProgress) {
             // Merge data
             const completeData = {
                 roads: [...majorRoads, ...minorRoads],
+                rails,
                 water,
                 parks,
                 buildings: [...(majorData.buildings || []), ...(stage2Buildings || [])],
@@ -565,10 +575,10 @@ export async function fetchOSMDataProgressiveBatched(lat, lon, distance, onProgr
         console.log('[MapDataFetcher] Stage 1 Batched: Fetching major features...');
         const majorQuery = buildMajorFeaturesQuery(lat, lon, fetchRadius);
         const majorElements = await fetchFromOverpass(majorQuery);
-        const { roads: majorRoads, water, parks } = processElements(majorElements);
+        const { roads: majorRoads, rails, water, parks } = processElements(majorElements);
 
         let currentRoads = [...majorRoads];
-        const majorData = { roads: currentRoads, water, parks, bounds };
+        const majorData = { roads: currentRoads, rails, water, parks, bounds };
 
         console.log(`[MapDataFetcher] Stage 1 complete: ${majorRoads.length} major roads`);
         if (onProgress) onProgress('major', majorData);
@@ -609,7 +619,7 @@ export async function fetchOSMDataProgressiveBatched(lat, lon, distance, onProgr
             console.warn('[MapDataFetcher] Stage 2b failed:', error.message);
         }
 
-        const finalData = { roads: currentRoads, water, parks, bounds };
+        const finalData = { roads: currentRoads, rails, water, parks, bounds };
 
         // Cache complete data
         cache.set(cacheKey + '_complete', {

@@ -127,6 +127,36 @@ export function renderRoads(roads, theme, bounds, width, height) {
  * @param {Object} bounds - Coordinate bounds
  * @returns {Array} Array of React SVG polygon/path elements
  */
+/**
+ * Render rails as SVG path elements
+ * 
+ * @param {Array} rails - Array of rail elements from OSM
+ * @param {Object} theme - Theme configuration
+ * @param {Object} bounds - Coordinate bounds
+ * @returns {Array} Array of React SVG path elements
+ */
+export function renderRails(rails, theme, bounds, width, height) {
+    if (!rails || rails.length === 0) return [];
+
+    return rails.map((rail, index) => {
+        const pathData = geometryToPath(rail.geometry, bounds, width, height);
+
+        if (!pathData) return null;
+
+        return {
+            type: 'path',
+            key: `rail-${index}`,
+            d: pathData,
+            stroke: theme.rail,
+            strokeWidth: 0.85, // Increased for visibility
+            fill: 'none',
+            strokeLinecap: 'butt',
+            strokeLinejoin: 'round',
+            strokeDasharray: '4,3' // Slightly longer dashes
+        };
+    }).filter(Boolean);
+}
+
 export function renderWater(water, theme, bounds, width, height) {
     if (!water || water.length === 0) return [];
 
@@ -250,7 +280,7 @@ export function renderMapElements(osmData, theme, width, height) {
         return { parks: [], water: [], roads: [], buildings: [] };
     }
 
-    const { roads, water, parks, buildings, bounds } = osmData;
+    const { roads, rails, water, parks, buildings, bounds } = osmData;
 
     // Sort roads by importance (render minor roads first)
     const sortedRoads = sortRoadsByImportance(roads);
@@ -259,6 +289,7 @@ export function renderMapElements(osmData, theme, width, height) {
         buildings: renderBuildings(buildings || [], theme, bounds, width, height),
         parks: renderParks(parks, theme, bounds, width, height),
         water: renderWater(water, theme, bounds, width, height),
+        rails: renderRails(rails || [], theme, bounds, width, height),
         roads: renderRoads(sortedRoads, theme, bounds, width, height),
     };
 }

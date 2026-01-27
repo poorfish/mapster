@@ -90,7 +90,7 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
 
     // Render SVG elements from OSM data
     const svgElements = useMemo(() => {
-        if (!osmData) return { parks: [], water: [], roads: [], buildings: [] }
+        if (!osmData) return { parks: [], water: [], rails: [], roads: [], buildings: [] }
         // Pass dynamic width and height to SVG transformer
         return renderMapElements(osmData, currentTheme, width, height)
     }, [osmData, currentTheme, width, height])
@@ -229,6 +229,20 @@ function PosterRenderer({ mapCenter, distance, city, country, theme, fontFamily,
                                     />
                                 )
                             )}
+
+                            {/* Rails layer (below roads) */}
+                            {svgElements.rails && svgElements.rails.map(element => (
+                                <path
+                                    key={element.key}
+                                    d={element.d}
+                                    stroke={element.stroke}
+                                    strokeWidth={element.strokeWidth}
+                                    fill={element.fill}
+                                    strokeLinecap={element.strokeLinecap}
+                                    strokeLinejoin={element.strokeLinejoin}
+                                    strokeDasharray={element.strokeDasharray}
+                                />
+                            ))}
 
                             {/* Roads layer (top) */}
                             {svgElements.roads.map(element => (
